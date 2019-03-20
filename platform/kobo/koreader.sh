@@ -144,7 +144,11 @@ if [ "${PRODUCT}" = "frost" ] || [ "${PRODUCT}" = "nova" ]; then
     ORIG_FB_ROTA="$(cat /sys/class/graphics/fb0/rotate)"
     # Don't do anything if we're already in the right orientation.
     if [ "${ORIG_FB_ROTA}" -ne "3" ]; then
-        echo 1 >/sys/class/graphics/fb0/rotate
+        if [ "${PRODUCT}" = "frost" ]; then
+            echo 1 >/sys/class/graphics/fb0/rotate
+        elif [ "${PRODUCT}" = "nova" ]; then
+            echo 3 >/sys/class/graphics/fb0/rotate
+        fi
     fi
 fi
 # NOTE: We don't have to restore anything on exit, nickel's startup process will take care of everything (pickel -> nickel).
@@ -220,7 +224,11 @@ if [ "${PRODUCT}" = "frost" ] || [ "${PRODUCT}" = "nova" ]; then
     # Only needed for KSM, pickel -> Nickel will restore its own rota properly
     if [ "${FROM_NICKEL}" != "true" ]; then
         # The Forma kernel inverts odd rotation constants, counteract that, à la Plato, because one-liner ;p.
-        echo "$(((4 - ORIG_FB_ROTA) % 4))" >/sys/class/graphics/fb0/rotate
+        if [ "${PRODUCT}" = "frost" ]; then
+            echo "$(((4 - ORIG_FB_ROTA) % 4))" >/sys/class/graphics/fb0/rotate
+        elif [ "${PRODUCT}" = "nova" ]; then
+            echo "${ORIG_FB_ROTA}" >/sys/class/graphics/fb0/rotate
+        fi
     fi
 fi
 
