@@ -125,7 +125,7 @@ function RenderImage:renderGifImageDataWithGifLib(data, size, want_frames, width
         frames.gif = gif
         local frames_mt = {}
         frames_mt.__gc = function(self)
-            print("frames.gc() called, closing GifDocument")
+            logger.dbg("frames.gc() called, closing GifDocument", self.gif)
             if self.gif_close_needed then
                 self.gif:close()
                 self.gif_close_needed = nil
@@ -137,7 +137,7 @@ function RenderImage:renderGifImageDataWithGifLib(data, size, want_frames, width
         -- So, also set this method, so that ImageViewer can explicitely call it onClose.
         frames.free = function(self)
             print(debug.traceback())
-            logger.dbg("frames.free() called, closing GifDocument", self, frames)
+            logger.dbg("frames.free() called, closing GifDocument", self.gif)
             if self.gif_close_needed then
                 self.gif:close()
                 self.gif_close_needed = nil
