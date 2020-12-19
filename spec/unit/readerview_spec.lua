@@ -38,6 +38,7 @@ describe("Readerview module", function()
         end
         assert.is.truthy(found)
 
+        readerui:closeDocument()
         readerui:onClose()
 
         assert.is.falsy(readerui.view.hinting)
@@ -47,8 +48,6 @@ describe("Readerview module", function()
                 error("UIManager's task queue should be emtpy.")
             end
         end
-        readerui:closeDocument()
-        readerui:onClose()
     end)
 
     it("should return and restore view context in page mode", function()

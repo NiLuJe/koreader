@@ -10,6 +10,12 @@ describe("Readertoc module", function()
         DEBUG = require("dbg")
 
         local sample_epub = "spec/front/unit/data/juliet.epub"
+        -- Clear settings from previous tests
+        local DocSettings = require("docsettings")
+        local doc_settings = DocSettings:open(sample_epub)
+        doc_settings:close()
+        doc_settings:purge()
+
         readerui = ReaderUI:new{
             dimen = Screen:getSize(),
             document = DocumentRegistry:openDocument(sample_epub),
