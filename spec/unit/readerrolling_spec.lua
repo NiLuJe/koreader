@@ -106,6 +106,7 @@ describe("Readerrolling module", function()
             txt_rolling:onGotoViewRel(1)
             assert.is.truthy(called)
             readerui.onEndOfBook = nil
+            txt_readerui:onClose()
         end)
     end)
 
@@ -160,6 +161,7 @@ describe("Readerrolling module", function()
     describe("switching screen mode should not change current page number", function()
         teardown(function()
             readerui:handleEvent(Event:new("SetRotationMode", Screen.ORIENTATION_PORTRAIT))
+            readerui:onClose()
         end)
         it("for portrait-landscape-portrait switching", function()
             for i = 80, 100, 10 do
@@ -205,10 +207,11 @@ describe("Readerrolling module", function()
             end
             local test_book = "spec/front/unit/data/sample.txt"
             require("docsettings"):open(test_book):purge()
-            ReaderUI:new{
+            local tmp_readerui = ReaderUI:new{
                 document = DocumentRegistry:openDocument(test_book),
             }
             ReaderView.onPageUpdate = saved_handler
+            tmp_readerui:onClose()
         end)
     end)
 end)

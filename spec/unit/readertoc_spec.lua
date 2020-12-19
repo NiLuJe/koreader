@@ -18,6 +18,9 @@ describe("Readertoc module", function()
         readerui.rolling:onGotoPage(0)
         toc = readerui.toc
     end)
+    teardown(function()
+        readerui:onClose()
+    end)
 
     it("should get max toc depth", function()
         toc_max_depth = toc:getMaxDepth()

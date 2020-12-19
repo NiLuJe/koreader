@@ -47,6 +47,7 @@ describe("Readerview module", function()
                 error("UIManager's task queue should be emtpy.")
             end
         end
+        readerui:onClose()
     end)
 
     it("should return and restore view context in page mode", function()
@@ -99,6 +100,7 @@ describe("Readerview module", function()
         assert.is.same(view.visible_area.x, 0)
         assert.is.same(view.visible_area.y, 10)
         G_reader_settings:delSetting("reader_footer_mode")
+        readerui:onClose()
     end)
 
     it("should return and restore view context in scroll mode", function()
@@ -152,5 +154,6 @@ describe("Readerview module", function()
         assert.is.same(view.page_states[1].visible_area.x, 0)
         assert.is.same(view.page_states[1].visible_area.y, 10)
         G_reader_settings:delSetting("reader_footer_mode")
+        readerui:onClose()
     end)
 end)

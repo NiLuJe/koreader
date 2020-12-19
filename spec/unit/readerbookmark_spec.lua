@@ -53,6 +53,9 @@ describe("ReaderBookmark module", function()
             }
             readerui.status.enabled = false
         end)
+        teardown(function()
+            readerui:onClose()
+        end)
         before_each(function()
             UIManager:quit()
             UIManager:show(readerui)
@@ -135,6 +138,9 @@ describe("ReaderBookmark module", function()
                 document = DocumentRegistry:openDocument(sample_pdf),
             }
             readerui.status.enabled = false
+        end)
+        teardown(function()
+            readerui:onClose()
         end)
         before_each(function()
             UIManager:quit()

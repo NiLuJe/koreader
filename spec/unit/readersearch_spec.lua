@@ -12,15 +12,18 @@ describe("Readersearch module", function()
     end)
 
     describe("search API for EPUB documents", function()
-        local doc, search, rolling
+        local readerui, doc, search, rolling
         setup(function()
-            local readerui = ReaderUI:new{
+            readerui = ReaderUI:new{
                 dimen = Screen:getSize(),
                 document = DocumentRegistry:openDocument(sample_epub),
             }
             doc = readerui.document
             search = readerui.search
             rolling = readerui.rolling
+        end)
+        teardown(function()
+            readerui:onClose()
         end)
         it("should search backward", function()
             rolling:onGotoPage(10)
@@ -117,15 +120,18 @@ describe("Readersearch module", function()
     end)
 
     describe("search API for PDF documents", function()
-        local doc, search, paging
+        local readerui, doc, search, paging
         setup(function()
-            local readerui = ReaderUI:new{
+            readerui = ReaderUI:new{
                 dimen = Screen:getSize(),
                 document = DocumentRegistry:openDocument(sample_pdf),
             }
             doc = readerui.document
             search = readerui.search
             paging = readerui.paging
+        end)
+        teardown(function()
+            readerui:onClose()
         end)
         it("should match single word with case insensitive option in one page", function()
             assert.are.equal(9, #doc.koptinterface:findAllMatches(doc, "what", true, 20))

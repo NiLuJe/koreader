@@ -89,6 +89,7 @@ describe("Readerfooter module", function()
         }
         assert.is.same(true, readerui.view.footer_visible)
         G_reader_settings:delSetting("reader_footer_mode")
+        readerui:onClose()
     end)
 
     it("should setup footer as visible not in all_at_once", function()
@@ -116,6 +117,7 @@ describe("Readerfooter module", function()
         assert.is.same(true, readerui.view.footer_visible)
         assert.is.same(1, readerui.view.footer.mode, 1)
         G_reader_settings:delSetting("reader_footer_mode")
+        readerui:onClose()
     end)
 
     it("should setup footer as invisible in full screen mode", function()
@@ -133,6 +135,7 @@ describe("Readerfooter module", function()
         }
         assert.is.same(false, readerui.view.footer_visible)
         G_reader_settings:delSetting("reader_footer_mode")
+        readerui:onClose()
     end)
 
     it("should setup footer as visible in mini progress bar mode", function()
@@ -150,6 +153,7 @@ describe("Readerfooter module", function()
         }
         assert.is.same(false, readerui.view.footer_visible)
         G_reader_settings:delSetting("reader_footer_mode")
+        readerui:onClose()
     end)
 
     it("should setup footer as invisible", function()
@@ -167,6 +171,7 @@ describe("Readerfooter module", function()
         }
         assert.is.same(true, readerui.view.footer_visible)
         G_reader_settings:delSetting("reader_footer_mode")
+        readerui:onClose()
     end)
 
     it("should setup footer for epub without error", function()
@@ -186,6 +191,7 @@ describe("Readerfooter module", function()
         -- c.f., NOTE above, Statistics are disabled, hence the N/A results
         assert.are.same('1 / '..page_count..' | '..timeinfo..' | ⇒ 0 | 0% | ⤠ 0% | ⏳ N/A | ⤻ N/A',
                         footer.footer_text.text)
+        readerui:onClose()
     end)
 
     it("should setup footer for pdf without error", function()
@@ -202,6 +208,7 @@ describe("Readerfooter module", function()
         local timeinfo = readerui.view.footer.textGeneratorMap.time(footer)
         assert.are.same('1 / 2 | '..timeinfo..' | ⇒ 1 | 0% | ⤠ 50% | ⏳ N/A | ⤻ N/A',
                         readerui.view.footer.footer_text.text)
+        readerui:onClose()
     end)
 
     it("should switch between different modes", function()
@@ -257,6 +264,7 @@ describe("Readerfooter module", function()
         -- reenable chapter time to read, text should be chapter time to read
         tapFooterMenu(fake_menu, "Chapter time to read".." (⤻)")
         assert.are.same('⤻ N/A', footer.footer_text.text)
+        readerui:onClose()
     end)
 
     it("should rotate through different modes", function()
@@ -296,6 +304,7 @@ describe("Readerfooter module", function()
         -- Make it visible again to make the following tests behave...
         footer:onTapFooter()
         assert.is.same(1, footer.mode)
+        readerui:onClose()
     end)
 
     it("should pick up screen resize in resetLayout", function()
@@ -330,6 +339,7 @@ describe("Readerfooter module", function()
         expected = is_am() and 518 or 510
         assert.is.same(expected, footer.progress_bar.width)
         Screen.getWidth = old_screen_getwidth
+        readerui:onClose()
     end)
 
     it("should update width on PosUpdate event", function()
@@ -353,6 +363,7 @@ describe("Readerfooter module", function()
         assert.are.same(expected, footer.progress_bar.width)
         expected = is_am() and 394 or 402
         assert.are.same(expected, footer.text_width)
+        readerui:onClose()
     end)
 
     it("should support chapter markers", function()
@@ -378,6 +389,7 @@ describe("Readerfooter module", function()
         footer.settings.toc_markers = false
         footer:setTocMarkers()
         assert.are.same(nil, footer.progress_bar.ticks)
+        readerui:onClose()
     end)
 
     it("should schedule/unschedule auto refresh time task", function()
@@ -412,6 +424,7 @@ describe("Readerfooter module", function()
             end
         end
         assert.is.same(0, found)
+        readerui:onClose()
     end)
 
     it("should not schedule auto refresh time task if footer is disabled", function()
@@ -438,6 +451,7 @@ describe("Readerfooter module", function()
             end
         end
         assert.is.same(0, found)
+        readerui:onClose()
     end)
 
     it("should toggle auto refresh time task by toggling the menu", function()
@@ -487,6 +501,7 @@ describe("Readerfooter module", function()
             end
         end
         assert.is.same(1, found)
+        readerui:onClose()
     end)
 
     it("should support toggle footer through menu if tap zone is disabled", function()
@@ -532,6 +547,7 @@ describe("Readerfooter module", function()
         assert.is.same(2, footer.mode)
 
         DTAP_ZONE_MINIBAR = saved_tap_zone_minibar --luacheck: ignore
+        readerui:onClose()
     end)
 
     it("should remove and add modes to footer text in all_at_once mode", function()
@@ -563,6 +579,7 @@ describe("Readerfooter module", function()
         -- add mode to footer text
         tapFooterMenu(fake_menu, "Progress percentage".." (⤠)")
         assert.are.same('1 / 2 | ⤠ 50%', footer.footer_text.text)
+        readerui:onClose()
     end)
 
     it("should initialize text mode in all_at_once mode", function()
@@ -587,6 +604,7 @@ describe("Readerfooter module", function()
         assert.is.truthy(footer.settings.all_at_once)
         assert.is.truthy(0, footer.mode)
         assert.is.falsy(readerui.view.footer_visible)
+        readerui:onClose()
     end)
 
     it("should support disabling all the modes", function()
@@ -624,6 +642,7 @@ describe("Readerfooter module", function()
         assert.is.same(true, footer.has_no_mode)
         tapFooterMenu(fake_menu, "Progress percentage".." (⤠)")
         assert.is.same(false, footer.has_no_mode)
+        readerui:onClose()
     end)
 
     it("should return correct footer height in time mode", function()
@@ -643,6 +662,7 @@ describe("Readerfooter module", function()
         assert.falsy(footer.has_no_mode)
         assert.truthy(readerui.view.footer_visible)
         assert.is.same(15, footer:getHeight())
+        readerui:onClose()
     end)
 
     it("should return correct footer height when all modes are disabled", function()
@@ -662,6 +682,7 @@ describe("Readerfooter module", function()
         assert.truthy(footer.has_no_mode)
         assert.truthy(readerui.view.footer_visible)
         assert.is.same(15, footer:getHeight())
+        readerui:onClose()
     end)
 
     it("should disable footer when all modes + progressbar are disabled", function()
@@ -680,6 +701,7 @@ describe("Readerfooter module", function()
 
         assert.truthy(footer.has_no_mode)
         assert.falsy(readerui.view.footer_visible)
+        readerui:onClose()
     end)
 
     it("should disable footer if settings.disabled is true", function()
@@ -698,6 +720,7 @@ describe("Readerfooter module", function()
         assert.falsy(readerui.view.footer_visible)
         assert.truthy(footer.onCloseDocument == nil)
         assert.truthy(footer.mode == 0)
+        readerui:onClose()
     end)
 
     it("should toggle between full and min progress bar for cre documents", function()
@@ -723,5 +746,6 @@ describe("Readerfooter module", function()
         readerui.rolling:onSetStatusLine(0)
         assert.is.same(0, footer.mode)
         assert.falsy(readerui.view.footer_visible)
+        readerui:onClose()
     end)
 end)

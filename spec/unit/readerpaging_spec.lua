@@ -20,6 +20,9 @@ describe("Readerpaging module", function()
             }
             paging = readerui.paging
         end)
+        teardown(function()
+            readerui:onClose()
+        end)
 
         it("should emit EndOfBook event at the end", function()
             UIManager:quit()
@@ -53,6 +56,9 @@ describe("Readerpaging module", function()
             }
             paging = readerui.paging
         end)
+        teardown(function()
+            readerui:onClose()
+        end)
 
         it("should emit EndOfBook event at the end", function()
             UIManager:quit()
@@ -81,6 +87,7 @@ describe("Readerpaging module", function()
                 document = DocumentRegistry:openDocument(sample_djvu),
             }
             tmp_readerui.paging:onScrollPanRel(-100)
+            tmp_readerui:onClose()
         end)
 
         it("should scroll forward on the last page without crash", function()
@@ -94,6 +101,7 @@ describe("Readerpaging module", function()
             paging:onScrollPanRel(120)
             paging:onScrollPanRel(-1)
             paging:onScrollPanRel(120)
+            tmp_readerui:onClose()
         end)
     end)
 end)
