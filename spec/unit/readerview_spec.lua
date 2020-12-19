@@ -38,7 +38,6 @@ describe("Readerview module", function()
         end
         assert.is.truthy(found)
 
-        readerui:closeDocument()
         readerui:onClose()
 
         assert.is.falsy(readerui.view.hinting)
@@ -47,6 +46,10 @@ describe("Readerview module", function()
             if task.action == readerui.view.emitHintPageEvent then
                 error("UIManager's task queue should be emtpy.")
             end
+        end
+
+        if readerui.document then
+            readerui:closeDocument()
         end
     end)
 
