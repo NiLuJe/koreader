@@ -97,6 +97,8 @@ describe("Readertoc module", function()
             assert.are.same(12, #toc.collapsed_toc)
             toc:collapseToc(18)
             assert.are.same(7, #toc.collapsed_toc)
+
+            --- @note: Delay the teardown 'til the last test, because of course the tests rely on incremental state changes across tests...
             readerui:closeDocument()
             readerui:onClose()
         end)
