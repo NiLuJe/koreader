@@ -47,6 +47,7 @@ describe("Readerview module", function()
                 error("UIManager's task queue should be emtpy.")
             end
         end
+        readerui:closeDocument()
         readerui:onClose()
     end)
 
@@ -100,6 +101,7 @@ describe("Readerview module", function()
         assert.is.same(view.visible_area.x, 0)
         assert.is.same(view.visible_area.y, 10)
         G_reader_settings:delSetting("reader_footer_mode")
+        readerui:closeDocument()
         readerui:onClose()
     end)
 
@@ -154,6 +156,7 @@ describe("Readerview module", function()
         assert.is.same(view.page_states[1].visible_area.x, 0)
         assert.is.same(view.page_states[1].visible_area.y, 10)
         G_reader_settings:delSetting("reader_footer_mode")
+        readerui:closeDocument()
         readerui:onClose()
     end)
 end)

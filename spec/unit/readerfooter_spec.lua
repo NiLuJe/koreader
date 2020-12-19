@@ -89,6 +89,7 @@ describe("Readerfooter module", function()
         }
         assert.is.same(true, readerui.view.footer_visible)
         G_reader_settings:delSetting("reader_footer_mode")
+        readerui:closeDocument()
         readerui:onClose()
     end)
 
@@ -117,6 +118,7 @@ describe("Readerfooter module", function()
         assert.is.same(true, readerui.view.footer_visible)
         assert.is.same(1, readerui.view.footer.mode, 1)
         G_reader_settings:delSetting("reader_footer_mode")
+        readerui:closeDocument()
         readerui:onClose()
     end)
 
@@ -135,6 +137,7 @@ describe("Readerfooter module", function()
         }
         assert.is.same(false, readerui.view.footer_visible)
         G_reader_settings:delSetting("reader_footer_mode")
+        readerui:closeDocument()
         readerui:onClose()
     end)
 
@@ -153,6 +156,7 @@ describe("Readerfooter module", function()
         }
         assert.is.same(false, readerui.view.footer_visible)
         G_reader_settings:delSetting("reader_footer_mode")
+        readerui:closeDocument()
         readerui:onClose()
     end)
 
@@ -171,6 +175,7 @@ describe("Readerfooter module", function()
         }
         assert.is.same(true, readerui.view.footer_visible)
         G_reader_settings:delSetting("reader_footer_mode")
+        readerui:closeDocument()
         readerui:onClose()
     end)
 
@@ -191,6 +196,7 @@ describe("Readerfooter module", function()
         -- c.f., NOTE above, Statistics are disabled, hence the N/A results
         assert.are.same('1 / '..page_count..' | '..timeinfo..' | ⇒ 0 | 0% | ⤠ 0% | ⏳ N/A | ⤻ N/A',
                         footer.footer_text.text)
+        readerui:closeDocument()
         readerui:onClose()
     end)
 
@@ -208,6 +214,7 @@ describe("Readerfooter module", function()
         local timeinfo = readerui.view.footer.textGeneratorMap.time(footer)
         assert.are.same('1 / 2 | '..timeinfo..' | ⇒ 1 | 0% | ⤠ 50% | ⏳ N/A | ⤻ N/A',
                         readerui.view.footer.footer_text.text)
+        readerui:closeDocument()
         readerui:onClose()
     end)
 
@@ -264,6 +271,7 @@ describe("Readerfooter module", function()
         -- reenable chapter time to read, text should be chapter time to read
         tapFooterMenu(fake_menu, "Chapter time to read".." (⤻)")
         assert.are.same('⤻ N/A', footer.footer_text.text)
+        readerui:closeDocument()
         readerui:onClose()
     end)
 
@@ -304,6 +312,7 @@ describe("Readerfooter module", function()
         -- Make it visible again to make the following tests behave...
         footer:onTapFooter()
         assert.is.same(1, footer.mode)
+        readerui:closeDocument()
         readerui:onClose()
     end)
 
@@ -339,6 +348,7 @@ describe("Readerfooter module", function()
         expected = is_am() and 518 or 510
         assert.is.same(expected, footer.progress_bar.width)
         Screen.getWidth = old_screen_getwidth
+        readerui:closeDocument()
         readerui:onClose()
     end)
 
@@ -363,6 +373,7 @@ describe("Readerfooter module", function()
         assert.are.same(expected, footer.progress_bar.width)
         expected = is_am() and 394 or 402
         assert.are.same(expected, footer.text_width)
+        readerui:closeDocument()
         readerui:onClose()
     end)
 
@@ -389,6 +400,7 @@ describe("Readerfooter module", function()
         footer.settings.toc_markers = false
         footer:setTocMarkers()
         assert.are.same(nil, footer.progress_bar.ticks)
+        readerui:closeDocument()
         readerui:onClose()
     end)
 
@@ -424,6 +436,7 @@ describe("Readerfooter module", function()
             end
         end
         assert.is.same(0, found)
+        readerui:closeDocument()
         readerui:onClose()
     end)
 
@@ -451,6 +464,7 @@ describe("Readerfooter module", function()
             end
         end
         assert.is.same(0, found)
+        readerui:closeDocument()
         readerui:onClose()
     end)
 
@@ -501,6 +515,7 @@ describe("Readerfooter module", function()
             end
         end
         assert.is.same(1, found)
+        readerui:closeDocument()
         readerui:onClose()
     end)
 
@@ -547,6 +562,7 @@ describe("Readerfooter module", function()
         assert.is.same(2, footer.mode)
 
         DTAP_ZONE_MINIBAR = saved_tap_zone_minibar --luacheck: ignore
+        readerui:closeDocument()
         readerui:onClose()
     end)
 
@@ -579,6 +595,7 @@ describe("Readerfooter module", function()
         -- add mode to footer text
         tapFooterMenu(fake_menu, "Progress percentage".." (⤠)")
         assert.are.same('1 / 2 | ⤠ 50%', footer.footer_text.text)
+        readerui:closeDocument()
         readerui:onClose()
     end)
 
@@ -604,6 +621,7 @@ describe("Readerfooter module", function()
         assert.is.truthy(footer.settings.all_at_once)
         assert.is.truthy(0, footer.mode)
         assert.is.falsy(readerui.view.footer_visible)
+        readerui:closeDocument()
         readerui:onClose()
     end)
 
@@ -642,6 +660,7 @@ describe("Readerfooter module", function()
         assert.is.same(true, footer.has_no_mode)
         tapFooterMenu(fake_menu, "Progress percentage".." (⤠)")
         assert.is.same(false, footer.has_no_mode)
+        readerui:closeDocument()
         readerui:onClose()
     end)
 
@@ -662,6 +681,7 @@ describe("Readerfooter module", function()
         assert.falsy(footer.has_no_mode)
         assert.truthy(readerui.view.footer_visible)
         assert.is.same(15, footer:getHeight())
+        readerui:closeDocument()
         readerui:onClose()
     end)
 
@@ -682,6 +702,7 @@ describe("Readerfooter module", function()
         assert.truthy(footer.has_no_mode)
         assert.truthy(readerui.view.footer_visible)
         assert.is.same(15, footer:getHeight())
+        readerui:closeDocument()
         readerui:onClose()
     end)
 
@@ -701,6 +722,7 @@ describe("Readerfooter module", function()
 
         assert.truthy(footer.has_no_mode)
         assert.falsy(readerui.view.footer_visible)
+        readerui:closeDocument()
         readerui:onClose()
     end)
 
@@ -720,6 +742,7 @@ describe("Readerfooter module", function()
         assert.falsy(readerui.view.footer_visible)
         assert.truthy(footer.onCloseDocument == nil)
         assert.truthy(footer.mode == 0)
+        readerui:closeDocument()
         readerui:onClose()
     end)
 
@@ -746,6 +769,7 @@ describe("Readerfooter module", function()
         readerui.rolling:onSetStatusLine(0)
         assert.is.same(0, footer.mode)
         assert.falsy(readerui.view.footer_visible)
+        readerui:closeDocument()
         readerui:onClose()
     end)
 end)

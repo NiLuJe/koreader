@@ -106,6 +106,7 @@ describe("Readerrolling module", function()
             txt_rolling:onGotoViewRel(1)
             assert.is.truthy(called)
             readerui.onEndOfBook = nil
+            txt_readerui:closeDocument()
             txt_readerui:onClose()
         end)
     end)
@@ -210,7 +211,9 @@ describe("Readerrolling module", function()
                 document = DocumentRegistry:openDocument(test_book),
             }
             ReaderView.onPageUpdate = saved_handler
+            tmp_readerui:closeDocument()
             tmp_readerui:onClose()
+            readerui:closeDocument()
             readerui:onClose()
         end)
     end)

@@ -20,6 +20,7 @@ describe("Readerdictionary module", function()
         dictionary = readerui.dictionary
     end)
     teardown(function()
+        readerui:closeDocument()
         readerui:onClose()
     end)
     it("should show quick lookup window", function()

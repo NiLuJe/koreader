@@ -21,6 +21,7 @@ describe("Readerpaging module", function()
             paging = readerui.paging
         end)
         teardown(function()
+            readerui:closeDocument()
             readerui:onClose()
         end)
 
@@ -57,6 +58,7 @@ describe("Readerpaging module", function()
             paging = readerui.paging
         end)
         teardown(function()
+            readerui:closeDocument()
             readerui:onClose()
         end)
 
@@ -87,6 +89,7 @@ describe("Readerpaging module", function()
                 document = DocumentRegistry:openDocument(sample_djvu),
             }
             tmp_readerui.paging:onScrollPanRel(-100)
+            tmp_readerui:closeDocument()
             tmp_readerui:onClose()
         end)
 
@@ -101,6 +104,7 @@ describe("Readerpaging module", function()
             paging:onScrollPanRel(120)
             paging:onScrollPanRel(-1)
             paging:onScrollPanRel(120)
+            tmp_readerui:closeDocument()
             tmp_readerui:onClose()
         end)
     end)
