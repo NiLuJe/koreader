@@ -35,6 +35,11 @@ common_info.device = {
 common_info.quickstart_guide = {
     text = _("Quickstart guide"),
     callback = function()
+        local FileManager = require("apps/filemanager/filemanager")
+        if FileManager.instance then
+            FileManager.instance:onClose()
+        end
+
         local QuickStart = require("ui/quickstart")
         local ReaderUI = require("apps/reader/readerui")
         ReaderUI:showReader(QuickStart:getQuickStart())

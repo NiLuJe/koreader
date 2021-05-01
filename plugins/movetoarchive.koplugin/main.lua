@@ -110,10 +110,10 @@ function MoveToArchive:commonProcess(is_move_process, moved_done_text)
     ReadCollection:updateItemByPath(document_full_path, dest_file)
     UIManager:show(ConfirmBox:new{
         text = moved_done_text,
-        ok_callback = function ()
+        ok_callback = function()
             ReaderUI:showReader(dest_file)
         end,
-        cancel_callback = function ()
+        cancel_callback = function()
             self:openFileBrowser(self.last_copied_from_dir)
         end,
     })

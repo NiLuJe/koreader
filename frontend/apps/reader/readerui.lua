@@ -591,12 +591,17 @@ function ReaderUI:doShowReader(file, provider)
     end
     Device:notifyBookState(title, document)
 
-    UIManager:show(reader)
-    _running_instance = reader
+    -- The ordering is more for show than anything, RD has already been instantiated by then.
+    -- If possible (i.e., file exists),
+    -- callers of showReader should take care of doing that themselves first,
+    -- to ensure (FM) Plugins are torn down and then (RD) instantiated in a sane order...
     local FileManager = require("apps/filemanager/filemanager")
     if FileManager.instance then
         FileManager.instance:onClose()
     end
+
+    UIManager:show(reader)
+    _running_instance = reader
 end
 
 function ReaderUI:_getRunningInstance()

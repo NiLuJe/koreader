@@ -21,7 +21,7 @@ function DropBox:showFiles(url, password)
     return DropBoxApi:showFiles(url, password)
 end
 
-function DropBox:downloadFile(item, password, path, close)
+function DropBox:downloadFile(item, password, path, callback_close)
     local code_response = DropBoxApi:downloadFile(item.url, password, path)
     if code_response == 200 then
         local __, filename = util.splitFilePathName(path)
@@ -34,7 +34,15 @@ function DropBox:downloadFile(item, password, path, close)
                 text = T(_("File saved to:\n%1\nWould you like to read the downloaded book now?"),
                     BD.filepath(path)),
                 ok_callback = function()
-                    close()
+                    if callback_close then
+                        callback_close()
+                    end
+
+                    local FileManager = require("apps/filemanager/filemanager")
+                    if FileManager.instance then
+                        FileManager.instance:onClose()
+                    end
+
                     ReaderUI:showReader(path)
                 end
             })

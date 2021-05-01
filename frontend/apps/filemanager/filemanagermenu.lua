@@ -122,13 +122,19 @@ function FileManagerMenu:onOpenLastDoc()
         })
         return
     end
-    local ReaderUI = require("apps/reader/readerui")
-    ReaderUI:showReader(last_file)
 
-    -- only close menu if we were called from the menu
+    -- Only close menu if we were called from the menu
     if self.menu_container then
         self:onCloseFileManagerMenu()
     end
+
+    -- Close the FM
+    if self.ui then
+        self.ui:onClose()
+    end
+
+    local ReaderUI = require("apps/reader/readerui")
+    ReaderUI:showReader(last_file)
 end
 
 function FileManagerMenu:setUpdateItemTable()
