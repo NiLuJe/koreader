@@ -507,6 +507,7 @@ function FileManager:setupLayout()
     end
 end
 
+-- NOTE: The only thing that will *ever* instantiate a new FileManager object is our very own showFiles below!
 function FileManager:init()
     self:setupLayout()
 
@@ -1152,6 +1153,10 @@ function FileManager:showFiles(path, focused_file)
         end
     }
     UIManager:show(file_manager)
+
+    -- NOTE: This is a bit clunky. This ought to be private and accessed via a getCurrentInstance method, àla ReaderUI.
+    --       But, it points to the *current* FM instance, and is nil'ed on exit.
+    --       As such, code outside of FileManager can just check/use FileManager.instance (which they do. extensively).
     self.instance = file_manager
 end
 

@@ -43,6 +43,11 @@ local function buildEntry(input_time, input_file)
             return lfs.attributes(file_path, "mode") == "file"
         end,
         callback = function()
+            local FileManager = require("apps/filemanager/filemanager")
+            if FileManager.instance then
+                -- Will cascade a close to FileManagerHistory, too
+                FileManager.instance:onClose()
+            end
             local ReaderUI = require("apps/reader/readerui")
             ReaderUI:showReader(input_file)
         end
