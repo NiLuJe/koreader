@@ -353,9 +353,9 @@ describe("UIManager spec", function()
             {
                 widget = {
                     handleEvent = function()
-                        UIManager._window_stack[2] = nil
-                        UIManager._window_stack[3] = nil
-                        UIManager._window_stack[4] = nil
+                        table.remove(UIManager._window_stack, #UIManager._window_stack - 1)
+                        table.remove(UIManager._window_stack, #UIManager._window_stack - 1)
+                        table.remove(UIManager._window_stack, #UIManager._window_stack - 1)
                     end
                 }
             },
