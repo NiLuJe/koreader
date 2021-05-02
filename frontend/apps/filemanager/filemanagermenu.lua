@@ -125,6 +125,9 @@ function FileManagerMenu:onOpenLastDoc()
 
     -- Only close menu if we were called from the menu
     if self.menu_container then
+        -- Mimic's FileManager's onShowReader refresh optimizations
+        self.ui.tearing_down = true
+        self.ui.dithered = nil
         self:onCloseFileManagerMenu()
     end
 
