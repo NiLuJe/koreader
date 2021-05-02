@@ -592,15 +592,12 @@ function TouchMenu:init()
 end
 
 function TouchMenu:onCloseWidget()
-    print("TouchMenu:onCloseWidget", self.ui, self.show_parent)
     -- NOTE: We don't pass a region in order to ensure a full-screen flash to avoid ghosting,
     --       but we only need to do that if we actually have a FM or RD below us.
     --       Don't do anything when we're switching between the two, or if we don't actually have a live instance of 'em...
     local FileManager = require("apps/filemanager/filemanager")
     local ReaderUI = require("apps/reader/readerui")
     local reader_ui = ReaderUI:_getRunningInstance()
-    print("FM", FileManager.instance, FileManager.instance and FileManager.instance.tearing_down)
-    print("RD", reader_ui, reader_ui and reader_ui.tearing_down)
     if (FileManager.instance and not FileManager.instance.tearing_down) or (reader_ui and not reader_ui.tearing_down) then
         UIManager:setDirty(nil, "flashui")
     end

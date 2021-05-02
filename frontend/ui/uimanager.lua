@@ -407,8 +407,6 @@ If refreshtype is omitted, no refresh will be enqueued at this time.
 @see setDirty
 ]]
 function UIManager:show(widget, refreshtype, refreshregion, x, y, refreshdither)
-    print("UIManager:show", widget, refreshtype, refreshregion, x, y, refreshdither)
-    print(debug.traceback())
     if not widget then
         logger.dbg("widget not exist to be shown")
         return
@@ -770,8 +768,6 @@ UIManager:setDirty(self.widget, function() return "ui", self.someelement.dimen e
 @bool refreshdither `true` if widget requires dithering (optional)
 ]]
 function UIManager:setDirty(widget, refreshtype, refreshregion, refreshdither)
-    print("UIManager:setDirty", widget, refreshtype, refreshregion, refreshdither)
-    print(debug.traceback())
     if widget then
         if widget == "all" then
             -- special case: set all top-level widgets as being "dirty".
@@ -1126,7 +1122,6 @@ function UIManager:sendEvent(event)
     local checked_widgets = {top_widget}
     local i = #self._window_stack
     while i > 0 do
-        print(i, "of", #self._window_stack)
         local widget = self._window_stack[i]
         if checked_widgets[widget] == nil then
             checked_widgets[widget] = true
@@ -1143,13 +1138,10 @@ function UIManager:sendEvent(event)
                 if widget.widget:handleEvent(event) then return end
             end
             i = #self._window_stack
-            print("reset i to", i)
         else
             i = i - 1
-            print("next i", i)
         end
     end
-    print("done")
 end
 
 --[[--
@@ -1158,27 +1150,20 @@ Transmits an @{ui.event.Event|Event} to all registered widgets.
 @param event an @{ui.event.Event|Event} object
 ]]
 function UIManager:broadcastEvent(event)
-    print("UIManager:broadcastEvent", event.handler)
-    print(debug.traceback())
     -- Unlike sendEvent, we send the event to *all* (window-level) widgets (i.e., we don't stop, even if a handler returns true).
     -- NOTE: Same defensive approach to _window_stack changing from under our feet as above.
     local checked_widgets = {}
     local i = #self._window_stack
     while i > 0 do
-        print(i)
         local widget = self._window_stack[i]
         if checked_widgets[widget] == nil then
             checked_widgets[widget] = true
-            print("broadcast to widget", widget.widget, i, "of", #self._window_stack)
             widget.widget:handleEvent(event)
             i = #self._window_stack
-            print("reset i to", i)
         else
             i = i - 1
-            print("next i", i)
         end
     end
-    print("done")
 end
 
 function UIManager:_checkTasks()
@@ -1293,8 +1278,6 @@ UIManager that a certain part of the screen is to be refreshed.
 @local Not to be used outside of UIManager!
 ]]
 function UIManager:_refresh(mode, region, dither)
-    print("UIManager:_refresh", mode, region, dither)
-    print(debug.traceback())
     if not mode then
         -- If we're trying to float a dither hint up from a lower widget after a close, mode might be nil...
         -- So use the lowest priority refresh mode (short of fast, because that'd do half-toning).

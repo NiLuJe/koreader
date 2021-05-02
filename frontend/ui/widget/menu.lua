@@ -963,7 +963,6 @@ function Menu:onShowReader()
 end
 
 function Menu:onCloseWidget()
-    print("Menu:onCloseWidget", self.ui, self.show_parent)
     --- @fixme
     -- we cannot refresh regionally using the dimen field
     -- because some menus without menu title use VerticalGroup to include
@@ -978,10 +977,8 @@ function Menu:onCloseWidget()
     local FileManager = require("apps/filemanager/filemanager")
     local ReaderUI = require("apps/reader/readerui")
     local reader_ui = ReaderUI:_getRunningInstance()
-    print("FM", FileManager.instance, FileManager.instance and FileManager.instance.tearing_down)
-    print("RD", reader_ui, reader_ui and reader_ui.tearing_down)
     if (FileManager.instance and not FileManager.instance.tearing_down) or (reader_ui and not reader_ui.tearing_down) then
-        UIManager:setDirty(nil, "partial")
+        UIManager:setDirty(nil, "ui")
     end
 end
 

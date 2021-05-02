@@ -425,7 +425,6 @@ function FileChooser:toggleReverseCollate()
 end
 
 function FileChooser:onMenuSelect(item)
-    print("FileChooser:onMenuSelect", item, item.path)
     -- parent directory of dir without permission get nil mode
     -- we need to change to parent path in this case
     if lfs.attributes(item.path, "mode") == "file" then

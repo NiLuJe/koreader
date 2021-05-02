@@ -539,7 +539,6 @@ function ReaderUI:showReader(file, provider)
 end
 
 function ReaderUI:showReaderCoroutine(file, provider)
-    print("ReaderUI:showReaderCoroutine", file)
     UIManager:show(InfoMessage:new{
         text = T(_("Opening file '%1'."), BD.filepath(file)),
         timeout = 0.0,

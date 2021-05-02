@@ -123,8 +123,6 @@ function FileManagerMenu:onOpenLastDoc()
         return
     end
 
-    print("FileManagerMenu:onOpenLastDoc", self, self.ui, self.show_parent)
-
     -- Only close menu if we were called from the menu
     if self.menu_container then
         self:onCloseFileManagerMenu()
