@@ -616,7 +616,7 @@ function ReaderUI:doShowReader(file, provider)
 
     -- This is mostly for the few callers that bypass the coroutine shenanigans and call doShowReader directly,
     -- instead of showReader...
-    -- Otherwise, showReader will have ensured this is done *before* instantiating a new RD,
+    -- Otherwise, showReader will have taken care of that *before* instantiating a new RD,
     -- in order to ensure a sane ordering of plugins teardown -> instantiation.
     local FileManager = require("apps/filemanager/filemanager")
     if FileManager.instance then
