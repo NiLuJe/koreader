@@ -326,7 +326,7 @@ describe("UIManager spec", function()
         UIManager:broadcastEvent("foo")
         assert.is.same(#UIManager._window_stack, 0)
 
-        -- Remember that the stack is processed top to bottom,
+        -- Remember that the stack is processed top to bottom!
         -- Test making a hole in the middle of the stack.
         UIManager._window_stack = {
             {
@@ -370,7 +370,7 @@ describe("UIManager spec", function()
         UIManager:broadcastEvent("foo")
         assert.is.same(2, #UIManager._window_stack)
 
-        -- Test insertign a new widget in the stack
+        -- Test inserting a new widget in the stack
         local new_widget = {
             widget = {
                 handleEvent = function()
