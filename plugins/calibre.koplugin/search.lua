@@ -285,14 +285,6 @@ function CalibreSearch:bookCatalog(t, option)
         entry.callback = function()
             self.search_menu:onClose()
 
-            --[[
-            -- File might not exist on device anymore, can't quite close the FM ourselves first...
-            local FileManager = require("apps/filemanager/filemanager")
-            if FileManager.instance then
-                FileManager.instance:onClose()
-            end
-            --]]
-
             local ReaderUI = require("apps/reader/readerui")
             ReaderUI:showReader(book.rootpath .. "/" .. book.lpath)
         end

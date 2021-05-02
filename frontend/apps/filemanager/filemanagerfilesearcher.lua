@@ -57,10 +57,6 @@ function FileSearcher:readDir()
                         text = f,
                         attr = attributes,
                         callback = function()
-                            if FileManager.instance then
-                                FileManager.instance:onClose()
-                            end
-
                             ReaderUI:showReader(fullpath)
                         end,
                     })

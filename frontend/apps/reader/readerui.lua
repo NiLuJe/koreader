@@ -482,7 +482,6 @@ end
 
 function ReaderUI:onShowReader()
     print("ReaderUI:onShowReader", self)
-    -- If we're receiving this, we're instantiated
 
     -- Allows us to optimize out a few useless refreshes in various CloseWidgets handlers...
     self.tearing_down = true
@@ -491,6 +490,7 @@ function ReaderUI:onShowReader()
     self:onClose()
 end
 
+--- @note: Will sanely close existing FileManager/ReaderUI instance for you!
 function ReaderUI:showReader(file, provider)
     logger.dbg("show reader ui")
 
@@ -777,6 +777,7 @@ function ReaderUI:reloadDocument(after_close_callback)
     local file = self.document.file
     local provider = getmetatable(self.document).__index
 
+    -- Mimic onShowReader's refresh optimizations
     self.tearing_down = true
     self.dithered = nil
 
@@ -795,6 +796,7 @@ end
 function ReaderUI:switchDocument(new_file)
     if not new_file then return end
 
+    -- Mimic onShowReader's refresh optimizations
     self.tearing_down = true
     self.dithered = nil
 

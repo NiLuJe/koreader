@@ -33,11 +33,6 @@ function OPDSCatalog:init()
                 ok_callback = function()
                     self:onClose()
 
-                    local FileManager = require("apps/filemanager/filemanager")
-                    if FileManager.instance then
-                        FileManager.instance:onClose()
-                    end
-
                     ReaderUI:showReader(downloaded_file)
                 end
             })

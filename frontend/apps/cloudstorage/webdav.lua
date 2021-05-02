@@ -34,11 +34,6 @@ function WebDav:downloadFile(item, address, username, password, local_path, call
                         callback_close()
                     end
 
-                    local FileManager = require("apps/filemanager/filemanager")
-                    if FileManager.instance then
-                        FileManager.instance:onClose()
-                    end
-
                     ReaderUI:showReader(local_path)
                 end
             })

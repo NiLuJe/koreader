@@ -44,12 +44,6 @@ function ReadCollection:prepareList(collection_name)
             dim = not file_exists, -- "dim", as expected by Menu
             mandatory = file_exists and util.getFriendlySize(lfs.attributes(v.file, "size") or 0),
             callback = function()
-                local FileManager = require("apps/filemanager/filemanager")
-                if FileManager.instance then
-                    -- Will cascade a close to whatever object implements FileManagerCollection (e.g., ListMenu), too
-                    FileManager.instance:onClose()
-                end
-
                 local ReaderUI = require("apps/reader/readerui")
                 ReaderUI:showReader(v.file)
             end

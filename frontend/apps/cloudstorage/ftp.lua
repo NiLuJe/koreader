@@ -47,11 +47,6 @@ function Ftp:downloadFile(item, address, user, pass, path, callback_close)
                         callback_close()
                     end
 
-                    local FileManager = require("apps/filemanager/filemanager")
-                    if FileManager.instance then
-                        FileManager.instance:onClose()
-                    end
-
                     ReaderUI:showReader(path)
                 end
             })

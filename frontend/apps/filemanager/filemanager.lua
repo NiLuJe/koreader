@@ -783,7 +783,6 @@ end
 
 function FileManager:onShowReader()
     print("FileManager:onShowReader", self)
-    -- If we're receiving this, we're instantiated
 
     -- Allows us to optimize out a few useless refreshes in various CloseWidgets handlers...
     self.tearing_down = true
@@ -839,7 +838,6 @@ function FileManager:openRandomFile(dir)
             choice1_text = _("Open"),
             choice1_callback = function()
                 ReaderUI:showReader(random_file)
-
             end,
             -- @translators Another file. This is a button on the open random file dialog. It presents a file with the choices Open/Another.
             choice2_text = _("Another"),
