@@ -373,9 +373,9 @@ describe("UIManager spec", function()
         -- Test insertign a new widget in the stack
         local new_widget = {
             widget = {
-                    handleEvent = function()
-                        assert.truthy(true)
-                    end
+                handleEvent = function()
+                    assert.truthy(true)
+                end
             }
         }
         UIManager._window_stack = {
