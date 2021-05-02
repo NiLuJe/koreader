@@ -961,6 +961,7 @@ function Menu:onShowReader()
     -- Clear the dither flag to prevent it from infecting the queue and re-inserting a full-screen refresh...
     self.dithered = nil
 end
+Menu.onSetupShowReader = Menu.onShowReader
 
 function Menu:onCloseWidget()
     --- @fixme
@@ -1206,10 +1207,10 @@ function Menu:onMenuSelect(item)
                 return true
             end
         end
+        self:onMenuChoice(item)
         if self.close_callback then
             self.close_callback()
         end
-        self:onMenuChoice(item)
     else
         -- save menu title for later resume
         self.item_table.title = self.title

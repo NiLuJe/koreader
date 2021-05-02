@@ -792,6 +792,14 @@ function FileManager:onShowReader()
     self:onClose()
 end
 
+-- Same as above, except we don't close it yet. Useful for plugins that need to close custom Menus before calling showReader.
+function FileManager:onSetupShowReader()
+    print("FileManager:onSetupShowReader", self)
+
+    self.tearing_down = true
+    self.dithered = nil
+end
+
 function FileManager:onRefresh()
     self.file_chooser:refreshPath()
     return true

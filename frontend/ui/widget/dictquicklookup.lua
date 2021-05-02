@@ -392,6 +392,8 @@ function DictQuickLookup:init()
                                                     self:onHoldClose(true)
                                                     -- close current ReaderUI in 1 sec, and create a new one
                                                     UIManager:scheduleIn(1.0, function()
+                                                        UIManager:broadcastEvent(Event:new("SetupShowReader"))
+
                                                         if self.ui then
                                                             -- close Highlight menu if any still shown
                                                             if self.ui.highlight and self.ui.highlight.highlight_dialog then

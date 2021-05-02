@@ -490,6 +490,14 @@ function ReaderUI:onShowReader()
     self:onClose()
 end
 
+-- Same as above, except we don't close it yet. Useful for plugins that need to close custom Menus before calling showReader.
+function ReaderUI:onSetupShowReader()
+    print("ReaderUI:onSetupShowReader", self)
+
+    self.tearing_down = true
+    self.dithered = nil
+end
+
 --- @note: Will sanely close existing FileManager/ReaderUI instance for you!
 function ReaderUI:showReader(file, provider)
     logger.dbg("show reader ui")

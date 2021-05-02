@@ -30,6 +30,9 @@ function WebDav:downloadFile(item, address, username, password, local_path, call
                 text = T(_("File saved to:\n%1\nWould you like to read the downloaded book now?"),
                     BD.filepath(local_path)),
                 ok_callback = function()
+                    local Event = require("ui/event")
+                    UIManager:broadcastEvent(Event:new("SetupShowReader"))
+
                     if callback_close then
                         callback_close()
                     end
