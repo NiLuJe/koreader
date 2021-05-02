@@ -15,12 +15,6 @@ local ReadHistory = {
 }
 
 local function selectCallback(path)
-    local FileManager = require("apps/filemanager/filemanager")
-    if FileManager.instance then
-        -- Will cascade a close to whatever object implements FileManagerHistory (e.g., CoverMenu), too
-        FileManager.instance:onClose()
-    end
-
     local ReaderUI = require("apps/reader/readerui")
     ReaderUI:showReader(path)
 end

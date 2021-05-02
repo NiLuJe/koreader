@@ -955,7 +955,15 @@ function Menu:init()
     end
 end
 
+function Menu:onShowReader()
+    print("Menu:onShowReader", self)
+
+    -- Clear the dither flag to prevent it from infecting the queue and re-inserting a full-screen refresh...
+    self.dithered = nil
+end
+
 function Menu:onCloseWidget()
+    print("Menu:onCloseWidget", self.ui, self.show_parent)
     --- @fixme
     -- we cannot refresh regionally using the dimen field
     -- because some menus without menu title use VerticalGroup to include
@@ -965,7 +973,16 @@ function Menu:onCloseWidget()
     -- the filemanager menu.
     -- NOTE: For the same reason, don't make it flash,
     --       because that'll trigger when we close the FM and open a book...
-    UIManager:setDirty(nil, "partial")
+
+    -- Don't do anything if we're in the process of tearing down FM or RD, or if we don't actually have a live instance of 'em...
+    local FileManager = require("apps/filemanager/filemanager")
+    local ReaderUI = require("apps/reader/readerui")
+    local reader_ui = ReaderUI:_getRunningInstance()
+    print("FM", FileManager.instance, FileManager.instance and FileManager.instance.tearing_down)
+    print("RD", reader_ui, reader_ui and reader_ui.tearing_down)
+    if (FileManager.instance and not FileManager.instance.tearing_down) or (reader_ui and not reader_ui.tearing_down) then
+        UIManager:setDirty(nil, "partial")
+    end
 end
 
 function Menu:updatePageInfo(select_number)

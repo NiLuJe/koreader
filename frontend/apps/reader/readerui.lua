@@ -480,6 +480,17 @@ function ReaderUI:showFileManager(file)
     end
 end
 
+function ReaderUI:onShowReader()
+    print("ReaderUI:onShowReader", self)
+    -- If we're receiving this, we're instantiated
+
+    -- Allows us to optimize out a few useless refreshes in various CloseWidgets handlers...
+    self.tearing_down = true
+    self.dithered = nil
+
+    self:onClose()
+end
+
 function ReaderUI:showReader(file, provider)
     logger.dbg("show reader ui")
 
@@ -497,6 +508,10 @@ function ReaderUI:showReader(file, provider)
         self:showFileManager(file)
         return
     end
+
+    -- We can now signal the existing ReaderUI/FileManager instances that it's time to go bye-bye...
+    UIManager:broadcastEvent(Event:new("ShowReader"))
+
     -- prevent crash due to incompatible bookmarks
     --- @todo Split bookmarks from metadata and do per-engine in conversion.
     provider = provider or DocumentRegistry:getProvider(file)
@@ -524,6 +539,7 @@ function ReaderUI:showReader(file, provider)
 end
 
 function ReaderUI:showReaderCoroutine(file, provider)
+    print("ReaderUI:showReaderCoroutine", file)
     UIManager:show(InfoMessage:new{
         text = T(_("Opening file '%1'."), BD.filepath(file)),
         timeout = 0.0,
@@ -550,7 +566,7 @@ end
 local _running_instance = nil
 function ReaderUI:doShowReader(file, provider)
     logger.info("opening file", file)
-    -- keep only one instance running
+    -- Keep only one instance running
     if _running_instance then
         _running_instance:onClose()
     end
@@ -591,10 +607,10 @@ function ReaderUI:doShowReader(file, provider)
     end
     Device:notifyBookState(title, document)
 
-    -- The ordering is more for show than anything, RD has already been instantiated by then.
-    -- If possible (i.e., file exists),
-    -- callers of showReader should take care of doing that themselves first,
-    -- to ensure (FM) Plugins are torn down and then (RD) instantiated in a sane order...
+    -- This is mostly for the few callers that bypass the coroutine shenanigans and call doShowReader directly,
+    -- instead of showReader...
+    -- Otherwise, showReader will have ensured this is done *before* instantiating a new RD,
+    -- in order to ensure a sane ordering of plugins teardown -> instantiation.
     local FileManager = require("apps/filemanager/filemanager")
     if FileManager.instance then
         FileManager.instance:onClose()
@@ -761,6 +777,10 @@ end
 function ReaderUI:reloadDocument(after_close_callback)
     local file = self.document.file
     local provider = getmetatable(self.document).__index
+
+    self.tearing_down = true
+    self.dithered = nil
+
     self:handleEvent(Event:new("CloseReaderMenu"))
     self:handleEvent(Event:new("CloseConfigMenu"))
     self.highlight:onClose() -- close highlight dialog if any
@@ -769,15 +789,21 @@ function ReaderUI:reloadDocument(after_close_callback)
         -- allow caller to do stuff between close an re-open
         after_close_callback(file, provider)
     end
+
     self:showReader(file, provider)
 end
 
 function ReaderUI:switchDocument(new_file)
     if not new_file then return end
+
+    self.tearing_down = true
+    self.dithered = nil
+
     self:handleEvent(Event:new("CloseReaderMenu"))
     self:handleEvent(Event:new("CloseConfigMenu"))
     self.highlight:onClose() -- close highlight dialog if any
     self:onClose(false)
+
     self:showReader(new_file)
 end
 

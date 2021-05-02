@@ -655,6 +655,7 @@ function CoverMenu:onCollectionsMenuHold(item)
 end
 
 function CoverMenu:onCloseWidget()
+    print("CoverMenu:onCloseWidget", self)
     -- Due to close callback in FileManagerHistory:onShowHist, we may be called
     -- multiple times (witnessed that with print(debug.traceback())
     -- So, avoid doing what follows twice

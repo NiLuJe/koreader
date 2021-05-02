@@ -407,6 +407,8 @@ If refreshtype is omitted, no refresh will be enqueued at this time.
 @see setDirty
 ]]
 function UIManager:show(widget, refreshtype, refreshregion, x, y, refreshdither)
+    print("UIManager:show", widget, refreshtype, refreshregion, x, y, refreshdither)
+    print(debug.traceback())
     if not widget then
         logger.dbg("widget not exist to be shown")
         return
@@ -768,6 +770,8 @@ UIManager:setDirty(self.widget, function() return "ui", self.someelement.dimen e
 @bool refreshdither `true` if widget requires dithering (optional)
 ]]
 function UIManager:setDirty(widget, refreshtype, refreshregion, refreshdither)
+    print("UIManager:setDirty", widget, refreshtype, refreshregion, refreshdither)
+    print(debug.traceback())
     if widget then
         if widget == "all" then
             -- special case: set all top-level widgets as being "dirty".
@@ -1076,7 +1080,8 @@ function UIManager:discardEvents(set_or_seconds)
 end
 
 --[[--
-Transmits an @{ui.event.Event|Event} to active widgets.
+Transmits an @{ui.event.Event|Event} to active widgets, top to bottom.
+Stops at the first handler that returns `true`.
 
 @param event an @{ui.event.Event|Event} object
 ]]
@@ -1113,28 +1118,38 @@ function UIManager:sendEvent(event)
         end
     end
 
-    -- if the event is not consumed, active widgets (from top to bottom) can access it.
-    -- NOTE: _window_stack can shrink when widgets are closed (CloseWidget & Close events).
+    -- If the event was not consumed (no handler returned true), active widgets (from top to bottom) can access it.
+    -- NOTE: _window_stack can shrink/grow when widgets are closed (CloseWidget & Close events) or opened.
+    --       Simply looping in reverse would only cover the list shrinking, and that only by a *single* element,
+    --       something we can't really guarantee, hence the nuclear option below.
+    --       Thankfully, that list should be very small, so the overhead should be minimal.
     local checked_widgets = {top_widget}
-    for i = #self._window_stack, 1, -1 do
+    local i = #self._window_stack
+    while i > 0 do
+        print(i, "of", #self._window_stack)
         local widget = self._window_stack[i]
         if checked_widgets[widget] == nil then
-            -- active widgets has precedence to handle this event
+            checked_widgets[widget] = true
+            -- Widget's active widgets have precedence to handle this event
             -- NOTE: While FileManager only has a single (screenshotter), ReaderUI has many active_widgets (each ReaderUI module gets added to the list).
             if widget.widget.active_widgets then
-                checked_widgets[widget] = true
                 for _, active_widget in ipairs(widget.widget.active_widgets) do
                     if active_widget:handleEvent(event) then return end
                 end
             end
             if widget.widget.is_always_active then
-                -- active widgets will handle this event
+                -- Widget itself is flagged always active, let it handle the event
                 -- NOTE: is_always_active widgets currently are widgets that want to show a VirtualKeyboard or listen to Dispatcher events
-                checked_widgets[widget] = true
                 if widget.widget:handleEvent(event) then return end
             end
+            i = #self._window_stack
+            print("reset i to", i)
+        else
+            i = i - 1
+            print("next i", i)
         end
     end
+    print("done")
 end
 
 --[[--
@@ -1143,20 +1158,27 @@ Transmits an @{ui.event.Event|Event} to all registered widgets.
 @param event an @{ui.event.Event|Event} object
 ]]
 function UIManager:broadcastEvent(event)
-    -- the widget's event handler might close widgets in which case
-    -- a simple iterator like ipairs would skip over some entries
-    local i = 1
-    while i <= #self._window_stack do
-        local prev_widget = self._window_stack[i].widget
-        self._window_stack[i].widget:handleEvent(event)
-        local top_widget = self._window_stack[i]
-        if top_widget == nil then
-            -- top widget closed itself
-            break
-        elseif top_widget.widget == prev_widget then
-            i = i + 1
+    print("UIManager:broadcastEvent", event.handler)
+    print(debug.traceback())
+    -- Unlike sendEvent, we send the event to *all* (window-level) widgets (i.e., we don't stop, even if a handler returns true).
+    -- NOTE: Same defensive approach to _window_stack changing from under our feet as above.
+    local checked_widgets = {}
+    local i = #self._window_stack
+    while i > 0 do
+        print(i)
+        local widget = self._window_stack[i]
+        if checked_widgets[widget] == nil then
+            checked_widgets[widget] = true
+            print("broadcast to widget", widget.widget, i, "of", #self._window_stack)
+            widget.widget:handleEvent(event)
+            i = #self._window_stack
+            print("reset i to", i)
+        else
+            i = i - 1
+            print("next i", i)
         end
     end
+    print("done")
 end
 
 function UIManager:_checkTasks()
@@ -1271,6 +1293,8 @@ UIManager that a certain part of the screen is to be refreshed.
 @local Not to be used outside of UIManager!
 ]]
 function UIManager:_refresh(mode, region, dither)
+    print("UIManager:_refresh", mode, region, dither)
+    print(debug.traceback())
     if not mode then
         -- If we're trying to float a dither hint up from a lower widget after a close, mode might be nil...
         -- So use the lowest priority refresh mode (short of fast, because that'd do half-toning).
