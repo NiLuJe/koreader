@@ -955,13 +955,13 @@ function Menu:init()
     end
 end
 
-function Menu:onShowReader()
-    print("Menu:onShowReader", self)
+function Menu:onShowingReader()
+    print("Menu:onShowingReader", self)
 
     -- Clear the dither flag to prevent it from infecting the queue and re-inserting a full-screen refresh...
     self.dithered = nil
 end
-Menu.onSetupShowReader = Menu.onShowReader
+Menu.onSetupShowReader = Menu.onShowingReader
 
 function Menu:onCloseWidget()
     --- @fixme

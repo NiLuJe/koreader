@@ -480,8 +480,8 @@ function ReaderUI:showFileManager(file)
     end
 end
 
-function ReaderUI:onShowReader()
-    print("ReaderUI:onShowReader", self)
+function ReaderUI:onShowingReader()
+    print("ReaderUI:onShowingReader", self)
 
     -- Allows us to optimize out a few useless refreshes in various CloseWidgets handlers...
     self.tearing_down = true
@@ -518,7 +518,7 @@ function ReaderUI:showReader(file, provider)
     end
 
     -- We can now signal the existing ReaderUI/FileManager instances that it's time to go bye-bye...
-    UIManager:broadcastEvent(Event:new("ShowReader"))
+    UIManager:broadcastEvent(Event:new("ShowingReader"))
 
     -- prevent crash due to incompatible bookmarks
     --- @todo Split bookmarks from metadata and do per-engine in conversion.
@@ -785,7 +785,7 @@ function ReaderUI:reloadDocument(after_close_callback)
     local file = self.document.file
     local provider = getmetatable(self.document).__index
 
-    -- Mimic onShowReader's refresh optimizations
+    -- Mimic onShowingReader's refresh optimizations
     self.tearing_down = true
     self.dithered = nil
 
@@ -804,7 +804,7 @@ end
 function ReaderUI:switchDocument(new_file)
     if not new_file then return end
 
-    -- Mimic onShowReader's refresh optimizations
+    -- Mimic onShowingReader's refresh optimizations
     self.tearing_down = true
     self.dithered = nil
 

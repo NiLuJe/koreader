@@ -781,8 +781,8 @@ function FileManager:onClose()
     return true
 end
 
-function FileManager:onShowReader()
-    print("FileManager:onShowReader", self)
+function FileManager:onShowingReader()
+    print("FileManager:onShowingReader", self)
 
     -- Allows us to optimize out a few useless refreshes in various CloseWidgets handlers...
     self.tearing_down = true

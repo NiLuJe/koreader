@@ -1119,7 +1119,9 @@ function UIManager:sendEvent(event)
     -- If the event was not consumed (no handler returned true), active widgets (from top to bottom) can access it.
     -- NOTE: _window_stack can shrink/grow when widgets are closed (CloseWidget & Close events) or opened.
     --       Simply looping in reverse would only cover the list shrinking, and that only by a *single* element,
-    --       something we can't really guarantee, hence the nuclear option below.
+    --       something we can't really guarantee, hence the more dogged iterator below,
+    --       which relies on a hash check of already processed widgets (LuaJIT actually hashes the table's GC reference),
+    --       rather than a simple loop counter, and will in fact iterate *at least* #items ^ 2 times.
     --       Thankfully, that list should be very small, so the overhead should be minimal.
     local checked_widgets = {top_widget}
     local i = #self._window_stack
