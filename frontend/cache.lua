@@ -211,6 +211,7 @@ function Cache:check(key, ItemClass)
         return self.cache[key]
     elseif ItemClass then
         local cached = self.cached[md5(key)]
+        print("On-disk file ought to be", md5(key))
         if cached then
             local item = ItemClass:new{}
             local ok, msg = pcall(item.load, item, cached)
@@ -242,13 +243,13 @@ function Cache:serialize()
         table.insert(sorted_caches, {file=file, time=lfs.attributes(file, "access")})
         cached_size = cached_size + (lfs.attributes(file, "size") or 0)
     end
-    table.sort(sorted_caches, function(v1,v2) return v1.time > v2.time end)
+    table.sort(sorted_caches, function(v1, v2) return v1.time > v2.time end)
     -- only serialize the most recently used cache
     local cache_size = 0
     for _, key in ipairs(self.cache_order) do
         local cache_item = self.cache[key]
 
-        -- only dump cache item that requests serialization explicitly
+        -- only dump cache items that request serialization explicitly
         if cache_item.persistent and cache_item.dump then
             local cache_full_path = cache_path..md5(key)
             local cache_file_exists = lfs.attributes(cache_full_path)
@@ -309,6 +310,15 @@ end
 -- Refresh the disk snapshot (mainly used by ui/data/onetime_migration)
 function Cache:refreshSnapshot()
     self.cached = getDiskCache()
+end
+
+-- Evict the disk cache (ditto)
+function Cache:clearDiskCache()
+    for _, file in pairs(self.cached) do
+        os.remove(file)
+    done
+
+    self:refreshSnapshot()
 end
 
 return Cache

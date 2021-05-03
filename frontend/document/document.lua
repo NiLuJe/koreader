@@ -375,6 +375,7 @@ end
 function Document:renderPage(pageno, rect, zoom, rotation, gamma, render_mode)
     local hash_excerpt
     local hash = self:getFullPageHash(pageno, zoom, rotation, gamma, render_mode, self.render_color)
+    print("Checking TileCacheItem for", hash)
     local tile = Cache:check(hash, TileCacheItem)
     if not tile then
         hash_excerpt = hash.."|"..tostring(rect)
@@ -448,10 +449,6 @@ function Document:hintPage(pageno, zoom, rotation, gamma, render_mode)
 
     logger.dbg("hinting page", pageno)
     self:renderPage(pageno, nil, zoom, rotation, gamma, render_mode)
-
-    if self._document.getCacheSize then
-        print("MµPDF cache size:", self._document.getCacheSize() / 1024 / 1024)
-    end
 end
 
 --[[
