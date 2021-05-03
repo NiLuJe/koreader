@@ -316,7 +316,7 @@ end
 function Cache:clearDiskCache()
     for _, file in pairs(self.cached) do
         os.remove(file)
-    done
+    end
 
     self:refreshSnapshot()
 end

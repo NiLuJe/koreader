@@ -10,9 +10,9 @@ local DEBUG = require("dbg")
 local Document = require("document/document")
 local Geom = require("ui/geometry")
 local KOPTContext = require("ffi/koptcontext")
+local Persist = require("persist")
 local TileCacheItem = require("document/tilecacheitem")
 local logger = require("logger")
-local serial = require("serialize")
 local util = require("ffi/util")
 
 local KoptInterface = {
@@ -36,16 +36,41 @@ end
 
 function ContextCacheItem:dump(filename)
     if self.kctx:isPreCache() == 0 then
-        logger.dbg("dumping koptcontext to", filename)
-        return serial.dump(self.size, KOPTContext.totable(self.kctx), filename)
+        logger.dbg("Dumping KOPTContext to", filename)
+
+        local cache_file = Persist:new{
+            path = filename,
+            codec = "zstd",
+        }
+
+        local t = KOPTContext.totable(self.kctx)
+        t.cache_size = self.size
+
+        local ok, size = cache_file:save(t)
+        if ok then
+            return size
+        else
+            logger.warn("Failed to dump KOPTContext")
+            return nil
+        end
     end
 end
 
 function ContextCacheItem:load(filename)
-    logger.dbg("loading koptcontext from", filename)
-    local size, kc_table = serial.load(filename)
-    self.size = size
-    self.kctx = KOPTContext.fromtable(kc_table)
+    logger.dbg("Loading KOPTContext from", filename)
+
+    local cache_file = Persist:new{
+        path = filename,
+        codec = "zstd",
+    }
+
+    local t = cache_file:load(filename)
+    if t then
+        self.size = t.cache_size
+        self.kctx = KOPTContext.fromtable(t)
+    else
+        logger.warn("Failed to load KOPTContext")
+    end
 end
 
 local OCREngine = CacheItem:new{}
