@@ -241,7 +241,7 @@ function Cache:willAccept(size)
 end
 
 function Cache:serialize()
-    -- calculate disk cache size
+    -- Calculate the current disk cache size
     local cached_size = 0
     local sorted_caches = {}
     for _, file in pairs(self.cached) do
@@ -254,7 +254,7 @@ function Cache:serialize()
     for _, key in ipairs(self.cache_order) do
         local cache_item = self.cache[key]
 
-        -- only dump cache items that request serialization explicitly
+        -- Only dump cache items that actually request persistence
         if cache_item.persistent and cache_item.dump then
             local cache_full_path = cache_path..md5(key)
             local cache_file_exists = lfs.attributes(cache_full_path)
@@ -266,8 +266,8 @@ function Cache:serialize()
             print("Dumped file size:", cache_size)
             if cache_size then
                 cached_size = cached_size + cache_size
-                serialized = serialized + 1
 
+                serialized = serialized + 1
                 -- We caught the current & hinted page, go away.
                 if serialized >= 2 then
                     break
@@ -275,7 +275,7 @@ function Cache:serialize()
             end
         end
     end
-    -- set disk cache the same limit as memory cache
+    -- Allocate the same amount of storage to the disk cache than the memory cache
     while cached_size > self.max_memsize do
         -- discard the least recently used cache
         local discarded = table.remove(sorted_caches)
@@ -287,7 +287,7 @@ function Cache:serialize()
             break
         end
     end
-    -- disk cache may have changes so need to refresh disk cache snapshot
+    -- We may have updated the disk cache's content, so refresh its state
     self.cached = getDiskCache()
 end
 
