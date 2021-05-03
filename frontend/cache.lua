@@ -232,7 +232,7 @@ end
 
 function Cache:willAccept(size)
     print("Cache:willAccept", size, size / 1024 / 1024)
-    -- we only allow single objects to fill 75% of the cache
+    -- We only allow single objects to fill 75% of the cache
     if size*4 < self.max_memsize*3 then
         print("true")
         return true

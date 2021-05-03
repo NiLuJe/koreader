@@ -406,11 +406,11 @@ function Document:renderPage(pageno, rect, zoom, rotation, gamma, render_mode)
     -- prepare cache item with contained blitbuffer
     tile = TileCacheItem:new{
         persistent = true,
-        size = size.w * size.h * (self.render_color and 4 or 1) + 512, -- estimation
         excerpt = size,
         pageno = pageno,
         bb = Blitbuffer.new(size.w, size.h, self.render_color and self.color_bb_type or nil)
     }
+    tile.size = tonumber(tile.bb.stride) * tile.bb.h + 512 -- estimation
 
     -- create a draw context
     local dc = DrawContext.new()

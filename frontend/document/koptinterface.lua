@@ -179,7 +179,8 @@ Auto detect bbox.
 function KoptInterface:getAutoBBox(doc, pageno)
     local native_size = Document.getNativePageDimensions(doc, pageno)
     local bbox = {
-        x0 = 0, y0 = 0,
+        x0 = 0,
+        y0 = 0,
         x1 = native_size.w,
         y1 = native_size.h,
     }
@@ -197,7 +198,7 @@ function KoptInterface:getAutoBBox(doc, pageno)
         else
             bbox = Document.getPageBBox(doc, pageno)
         end
-        Cache:insert(hash, CacheItem:new{ autobbox = bbox })
+        Cache:insert(hash, CacheItem:new{ autobbox = bbox, size = 160 })
         page:close()
         kc:free()
         return bbox
@@ -232,7 +233,7 @@ function KoptInterface:getSemiAutoBBox(doc, pageno)
             auto_bbox = bbox
         end
         page:close()
-        Cache:insert(hash, CacheItem:new{ semiautobbox = auto_bbox })
+        Cache:insert(hash, CacheItem:new{ semiautobbox = auto_bbox, size = 160 })
         kc:free()
         return auto_bbox
     else
@@ -266,7 +267,7 @@ function KoptInterface:getCachedContext(doc, pageno)
         --self:logReflowDuration(pageno, dur)
         local fullwidth, fullheight = kc:getPageDim()
         logger.dbg("reflowed page", pageno, "fullwidth:", fullwidth, "fullheight:", fullheight)
-        self.last_context_size = fullwidth * fullheight + 128 -- estimation
+        self.last_context_size = fullwidth * fullheight + 3072 -- estimation
         Cache:insert(kctx_hash, ContextCacheItem:new{
             persistent = true,
             size = self.last_context_size,
@@ -277,7 +278,7 @@ function KoptInterface:getCachedContext(doc, pageno)
         -- wait for background thread
         local kc = self:waitForContext(cached.kctx)
         local fullwidth, fullheight = kc:getPageDim()
-        self.last_context_size = fullwidth * fullheight + 128 -- estimation
+        self.last_context_size = fullwidth * fullheight + 3072 -- estimation
         return kc
     end
 end
@@ -338,20 +339,20 @@ function KoptInterface:renderReflowedPage(doc, pageno, rect, zoom, rotation, ren
 
     local cached = Cache:check(renderpg_hash)
     if not cached then
-        -- do the real reflowing if kctx is not been cached yet
+        -- do the real reflowing if kctx has not been cached yet
         local kc = self:getCachedContext(doc, pageno)
         local fullwidth, fullheight = kc:getPageDim()
-        if not Cache:willAccept(fullwidth * fullheight / 2) then
+        if not Cache:willAccept(fullwidth * fullheight) then
             -- whole page won't fit into cache
             error("aborting, since we don't have enough cache for this page")
         end
         -- prepare cache item with contained blitbuffer
         local tile = TileCacheItem:new{
-            size = fullwidth * fullheight + 64, -- estimation
             excerpt = Geom:new{ w = fullwidth, h = fullheight },
             pageno = pageno,
         }
         tile.bb = kc:dstToBlitBuffer()
+        tile.size = tonumber(tile.bb.stride) * tile.bb.h + 512 -- estimation
         Cache:insert(renderpg_hash, tile)
         return tile
     else
@@ -389,7 +390,6 @@ function KoptInterface:renderOptimizedPage(doc, pageno, rect, zoom, rotation, re
         -- prepare cache item with contained blitbuffer
         local tile = TileCacheItem:new{
             persistent = true,
-            size = fullwidth * fullheight + 64, -- estimation
             excerpt = Geom:new{
                 x = 0, y = 0,
                 w = fullwidth,
@@ -398,6 +398,7 @@ function KoptInterface:renderOptimizedPage(doc, pageno, rect, zoom, rotation, re
             pageno = pageno,
         }
         tile.bb = kc:dstToBlitBuffer()
+        tile.size = tonumber(tile.bb.stride) * tile.bb.h + 512 -- estimation
         kc:free()
         Cache:insert(renderpg_hash, tile)
         return tile
@@ -504,8 +505,8 @@ function KoptInterface:getReflowedTextBoxes(doc, pageno)
             local kc = self:waitForContext(cached.kctx)
             --kc:setDebug()
             local fullwidth, fullheight = kc:getPageDim()
-            local boxes = kc:getReflowedWordBoxes("dst", 0, 0, fullwidth, fullheight)
-            Cache:insert(hash, CacheItem:new{ rfpgboxes = boxes })
+            local boxes, nr_word = kc:getReflowedWordBoxes("dst", 0, 0, fullwidth, fullheight)
+            Cache:insert(hash, CacheItem:new{ rfpgboxes = boxes, size = 192 * nr_word }) -- estimation
             return boxes
         end
     else
@@ -528,8 +529,8 @@ function KoptInterface:getNativeTextBoxes(doc, pageno)
             local kc = self:waitForContext(cached.kctx)
             --kc:setDebug()
             local fullwidth, fullheight = kc:getPageDim()
-            local boxes = kc:getNativeWordBoxes("dst", 0, 0, fullwidth, fullheight)
-            Cache:insert(hash, CacheItem:new{ nativepgboxes = boxes })
+            local boxes, nr_word = kc:getNativeWordBoxes("dst", 0, 0, fullwidth, fullheight)
+            Cache:insert(hash, CacheItem:new{ nativepgboxes = boxes, size = 192 * nr_word }) -- estimation
             return boxes
         end
     else
@@ -555,8 +556,8 @@ function KoptInterface:getReflowedTextBoxesFromScratch(doc, pageno)
             local fullwidth, fullheight = reflowed_kc:getPageDim()
             local kc = self:createContext(doc, pageno)
             kc:copyDestBMP(reflowed_kc)
-            local boxes = kc:getNativeWordBoxes("dst", 0, 0, fullwidth, fullheight)
-            Cache:insert(hash, CacheItem:new{ scratchrfpgboxes = boxes })
+            local boxes, nr_word = kc:getNativeWordBoxes("dst", 0, 0, fullwidth, fullheight)
+            Cache:insert(hash, CacheItem:new{ scratchrfpgboxes = boxes, size = 192 * nr_word }) -- estimation
             kc:free()
             return boxes
         end
@@ -601,8 +602,8 @@ function KoptInterface:getNativeTextBoxesFromScratch(doc, pageno)
         kc:setZoom(1.0)
         local page = doc._document:openPage(pageno)
         page:getPagePix(kc)
-        local boxes = kc:getNativeWordBoxes("src", 0, 0, page_size.w, page_size.h)
-        Cache:insert(hash, CacheItem:new{ scratchnativepgboxes = boxes })
+        local boxes, nr_word = kc:getNativeWordBoxes("src", 0, 0, page_size.w, page_size.h)
+        Cache:insert(hash, CacheItem:new{ scratchnativepgboxes = boxes, size = 192 * nr_word }) -- estimation
         page:close()
         kc:free()
         return boxes
@@ -633,7 +634,7 @@ function KoptInterface:getPageBlock(doc, pageno, x, y)
         local page = doc._document:openPage(pageno)
         page:getPagePix(kc)
         kc:findPageBlocks()
-        Cache:insert(hash, CacheItem:new{ kctx = kc })
+        Cache:insert(hash, CacheItem:new{ kctx = kc, size = 3072 }) -- estimation
         page:close()
         kctx = kc
     else
@@ -647,7 +648,7 @@ Get word from OCR providing selected word box.
 --]]
 function KoptInterface:getOCRWord(doc, pageno, wbox)
     if not Cache:check(self.ocrengine) then
-        Cache:insert(self.ocrengine, OCREngine:new{ ocrengine = KOPTContext.new() })
+        Cache:insert(self.ocrengine, OCREngine:new{ ocrengine = KOPTContext.new(), size = 3072 }) -- estimation
     end
     if doc.configurable.text_wrap == 1 then
         return self:getReflewOCRWord(doc, pageno, wbox.sbox)
@@ -674,7 +675,7 @@ function KoptInterface:getReflewOCRWord(doc, pageno, rect)
                 kc.getTOCRWord, kc, "dst",
                 rect.x, rect.y, rect.w, rect.h,
                 self.tessocr_data, self.ocr_lang, self.ocr_type, 0, 1)
-            Cache:insert(hash, CacheItem:new{ rfocrword = word })
+            Cache:insert(hash, CacheItem:new{ rfocrword = word, size = #word + 64 }) -- estimation
             return word
         end
     else
@@ -707,7 +708,7 @@ function KoptInterface:getNativeOCRWord(doc, pageno, rect)
             kc.getTOCRWord, kc, "src",
             0, 0, word_w, word_h,
             self.tessocr_data, self.ocr_lang, self.ocr_type, 0, 1)
-        Cache:insert(hash, CacheItem:new{ ocrword = word })
+        Cache:insert(hash, CacheItem:new{ ocrword = word, size = #word + 64 }) -- estimation
         logger.dbg("word", word)
         page:close()
         kc:free()
@@ -722,7 +723,7 @@ Get text from OCR providing selected text boxes.
 --]]
 function KoptInterface:getOCRText(doc, pageno, tboxes)
     if not Cache:check(self.ocrengine) then
-        Cache:insert(self.ocrengine, OCREngine:new{ ocrengine = KOPTContext.new() })
+        Cache:insert(self.ocrengine, OCREngine:new{ ocrengine = KOPTContext.new(), size = 3072 }) -- estimation
     end
     logger.info("Not implemented yet")
 end
