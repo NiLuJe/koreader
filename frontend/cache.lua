@@ -249,8 +249,8 @@ function Cache:serialize()
         cached_size = cached_size + (lfs.attributes(file, "size") or 0)
     end
     table.sort(sorted_caches, function(v1, v2) return v1.time > v2.time end)
-    -- only serialize the most recently used cache.
-    -- NOTE: Fun fact: that'll be the *next* page (from Document:hintPage), not the current one...
+    -- Only serialize the two most recently used cache items (in order to cache the current as well as the hinted page).
+    local serialized = 0
     for _, key in ipairs(self.cache_order) do
         local cache_item = self.cache[key]
 
@@ -266,7 +266,12 @@ function Cache:serialize()
             print("Dumped file size:", cache_size)
             if cache_size then
                 cached_size = cached_size + cache_size
-                break
+                serialized = serialized + 1
+
+                -- We caught the current & hinted page, go away.
+                if serialized >= 2 then
+                    break
+                end
             end
         end
     end
