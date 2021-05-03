@@ -263,7 +263,7 @@ function Cache:serialize()
             logger.dbg("dump cache item", key)
             local cache_size = cache_item:dump(cache_full_path) or 0
             print("Dumped file size:", cache_size)
-            if cache_size > 0 then
+            if cache_size then
                 cached_size = cached_size + cache_size
                 break
             end
