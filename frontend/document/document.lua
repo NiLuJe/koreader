@@ -101,9 +101,8 @@ function Document:close()
             self._document:close()
             self._document = nil
 
-            -- Attempt to force collection of FFI objects *now*, instead of on the next DocumentRegistry:openDocument...
-            collectgarbage()
-            collectgarbage()
+            -- NOTE: DocumentRegistry:openDocument will force a GC sweep the next time we open a Document.
+            --       MµPDF will also do a bit of spring cleaning of tis internal cache when opening a different document.
         else
            logger.warn("Tried to close a document with remaining hot references")
         end
