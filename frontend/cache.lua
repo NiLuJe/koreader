@@ -249,7 +249,8 @@ function Cache:serialize()
         cached_size = cached_size + (lfs.attributes(file, "size") or 0)
     end
     table.sort(sorted_caches, function(v1, v2) return v1.time > v2.time end)
-    -- only serialize the most recently used cache
+    -- only serialize the most recently used cache.
+    -- NOTE: Fun fact: that'll be the *next* page (from Document:hintPage), not the current one...
     for _, key in ipairs(self.cache_order) do
         local cache_item = self.cache[key]
 
