@@ -448,6 +448,10 @@ function Document:hintPage(pageno, zoom, rotation, gamma, render_mode)
 
     logger.dbg("hinting page", pageno)
     self:renderPage(pageno, nil, zoom, rotation, gamma, render_mode)
+
+    if self._document.getCacheSize then
+        print("MµPDF cache size:", self._document.getCacheSize() / 1024 / 1024)
+    end
 end
 
 --[[
