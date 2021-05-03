@@ -250,6 +250,7 @@ function KoptInterface:getCachedContext(doc, pageno)
     local bbox = doc:getPageBBox(pageno)
     local context_hash = self:getContextHash(doc, pageno, bbox)
     local kctx_hash = "kctx|"..context_hash
+    print("Checking ContextCacheItem for", kctx_hash)
     local cached = Cache:check(kctx_hash, ContextCacheItem)
     if not cached then
         -- If kctx is not cached, create one and get reflowed bmp in foreground.
