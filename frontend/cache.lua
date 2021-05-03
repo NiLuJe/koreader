@@ -188,7 +188,12 @@ function Cache:insert(key, object)
     while self.current_memsize + object.size > self.max_memsize do
         print("Evicting LRU")
         local removed_key = table.remove(self.cache_order)
-        self:_free(removed_key)
+        if removed_key then
+            self:_free(removed_key)
+        else
+            logger.warn("Cache accounting is broken")
+            break
+        end
     end
     -- insert new object in front of the LRU order
     table.insert(self.cache_order, 1, key)
@@ -245,7 +250,6 @@ function Cache:serialize()
     end
     table.sort(sorted_caches, function(v1, v2) return v1.time > v2.time end)
     -- only serialize the most recently used cache
-    local cache_size = 0
     for _, key in ipairs(self.cache_order) do
         local cache_item = self.cache[key]
 
@@ -257,16 +261,25 @@ function Cache:serialize()
             if cache_file_exists then break end
 
             logger.dbg("dump cache item", key)
-            cache_size = cache_item:dump(cache_full_path) or 0
-            if cache_size > 0 then break end
+            local cache_size = cache_item:dump(cache_full_path) or 0
+            print("Dumped file size:", cache_size)
+            if cache_size > 0 then
+                cached_size = cached_size + cache_size
+                break
+            end
         end
     end
     -- set disk cache the same limit as memory cache
-    while cached_size + cache_size - self.max_memsize > 0 do
+    while cached_size > self.max_memsize do
         -- discard the least recently used cache
         local discarded = table.remove(sorted_caches)
-        cached_size = cached_size - lfs.attributes(discarded.file, "size")
-        os.remove(discarded.file)
+        if discarded then
+            cached_size = cached_size - lfs.attributes(discarded.file, "size")
+            os.remove(discarded.file)
+        else
+            logger.warn("Cache accounting is broken")
+            break
+        end
     end
     -- disk cache may have changes so need to refresh disk cache snapshot
     self.cached = getDiskCache()
