@@ -14,26 +14,26 @@ end
 
 -- For documentation purposes, here's a battle-tested shell version of calcFreeMem
 --[[
-	if grep -q 'MemAvailable' /proc/meminfo ; then
-		# We'll settle for 85% of available memory to leave a bit of breathing room
-		tmpfs_size="$(awk '/MemAvailable/ {printf "%d", $2 * 0.85}' /proc/meminfo)"
-	elif grep -q 'Inactive(file)' /proc/meminfo ; then
-		# Basically try to emulate the kernel's computation, c.f., https://unix.stackexchange.com/q/261247
-		# Again, 85% of available memory
-		tmpfs_size="$(awk -v low=$(grep low /proc/zoneinfo | awk '{k+=$2}END{printf "%d", k}') \
-			'{a[$1]=$2}
-			END{
-				printf "%d", (a["MemFree:"]+a["Active(file):"]+a["Inactive(file):"]+a["SReclaimable:"]-(12*low))*0.85;
-			}' /proc/meminfo)"
-	else
-		# Ye olde crap workaround of Free + Buffers + Cache...
-		# Take it with a grain of salt, and settle for 80% of that...
-		tmpfs_size="$(awk \
-			'{a[$1]=$2}
-			END{
-				printf "%d", (a["MemFree:"]+a["Buffers:"]+a["Cached:"])*0.80;
-			}' /proc/meminfo)"
-	fi
+    if grep -q 'MemAvailable' /proc/meminfo ; then
+        # We'll settle for 85% of available memory to leave a bit of breathing room
+        tmpfs_size="$(awk '/MemAvailable/ {printf "%d", $2 * 0.85}' /proc/meminfo)"
+    elif grep -q 'Inactive(file)' /proc/meminfo ; then
+        # Basically try to emulate the kernel's computation, c.f., https://unix.stackexchange.com/q/261247
+        # Again, 85% of available memory
+        tmpfs_size="$(awk -v low=$(grep low /proc/zoneinfo | awk '{k+=$2}END{printf "%d", k}') \
+            '{a[$1]=$2}
+            END{
+                printf "%d", (a["MemFree:"]+a["Active(file):"]+a["Inactive(file):"]+a["SReclaimable:"]-(12*low))*0.85;
+            }' /proc/meminfo)"
+    else
+        # Ye olde crap workaround of Free + Buffers + Cache...
+        # Take it with a grain of salt, and settle for 80% of that...
+        tmpfs_size="$(awk \
+            '{a[$1]=$2}
+            END{
+                printf "%d", (a["MemFree:"]+a["Buffers:"]+a["Cached:"])*0.80;
+            }' /proc/meminfo)"
+    fi
 --]]
 
 -- And here's our simplified Lua version...
