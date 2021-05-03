@@ -92,10 +92,23 @@ end
 
 -- this might be overridden by a document implementation
 function Document:close()
+    print("Document:close", self, self.file)
     local DocumentRegistry = require("document/documentregistry")
-    if self.is_open and DocumentRegistry:closeDocument(self.file) == 0 then
-        self.is_open = false
-        self._document:close()
+    if self.is_open then
+        if DocumentRegistry:closeDocument(self.file) == 0 then
+            print("Closing", self._document)
+            self.is_open = false
+            self._document:close()
+            self._document = nil
+
+            -- Attempt to force collection of FFI objects *now*, instead of on the next DocumentRegistry:openDocument...
+            collectgarbage()
+            collectgarbage()
+        else
+           logger.warn("Tried to close a document with remaining hot references")
+        end
+    else
+        logger.warn("Tried to close an already closed document")
     end
 end
 
@@ -375,7 +388,7 @@ function Document:renderPage(pageno, rect, zoom, rotation, gamma, render_mode)
     -- this will be the size we actually render
     local size = page_size
     -- we prefer to render the full page, if it fits into cache
-    if not Cache:willAccept(size.w * size.h + 64) then
+    if not Cache:willAccept(size.w * size.h * (self.render_color and 4 or 1) + 512) then
         -- whole page won't fit into cache
         logger.dbg("rendering only part of the page")
         --- @todo figure out how to better segment the page
@@ -392,7 +405,7 @@ function Document:renderPage(pageno, rect, zoom, rotation, gamma, render_mode)
     -- prepare cache item with contained blitbuffer
     tile = TileCacheItem:new{
         persistent = true,
-        size = size.w * size.h + 64, -- estimation
+        size = size.w * size.h * (self.render_color and 4 or 1) + 512, -- estimation
         excerpt = size,
         pageno = pageno,
         bb = Blitbuffer.new(size.w, size.h, self.render_color and self.color_bb_type or nil)
@@ -429,6 +442,10 @@ end
 -- a hint for the cache engine to paint a full page to the cache
 --- @todo this should trigger a background operation
 function Document:hintPage(pageno, zoom, rotation, gamma, render_mode)
+    --- @fixme: Super-crappy workaround for #7627: if we're eating too much RAM, drop half the cache...
+    ---         Revisit once we bump MµPDF...
+    Cache:redlineCheck()
+
     logger.dbg("hinting page", pageno)
     self:renderPage(pageno, nil, zoom, rotation, gamma, render_mode)
 end
