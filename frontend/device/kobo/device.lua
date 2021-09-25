@@ -814,7 +814,6 @@ function Kobo:resume()
 end
 
 local function suspendToRAM()
-    logger.info("Kobo standby: entering lights on standby")
     logger.info("Kobo standby: asking for a suspend to RAM . . .")
     local f = io.open("/sys/power/state", "w")
     if not f then
@@ -843,6 +842,7 @@ function Kobo:enterStandby()
         return
     end
 
+    logger.info("Kobo standby: Scheduling a lights on standby")
     local UIManager = require("ui/uimanager")
     UIManager:unschedule(suspendToRAM)
     UIManager:scheduleIn(6, suspendToRAM)
