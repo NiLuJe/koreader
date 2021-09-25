@@ -470,12 +470,14 @@ local function isWifiOn()
     -- We could alternatively check if lfs.attributes("/proc/sys/net/ipv4/conf/" .. os.getenv("INTERFACE"), "mode") == "directory"
     -- c.f., also what Cervantes does via /sys/class/net/eth0/carrier to check if the interface is up.
     -- That said, since we only care about whether *modules* are loaded, this does the job nicely.
+    local found = false
     for haystack in io.lines("/proc/modules") do
         if haystack:sub(1, nlen) == needle then
-            return true
+            found = true
+            break
         end
     end
-    return false
+    return found
 end
 
 function Kobo:initNetworkManager(NetworkMgr)
