@@ -813,18 +813,7 @@ function Kobo:resume()
     end
 end
 
--- TODO: Setup a wake alarm for AutoSuspend plugin stuff
-function Kobo:enterStandby()
-    if self.powerd:isCharging() then
-        logger.info("Kobo standby: Device is charging: not entering lights on standby")
-        return
-    end
-
-    if isWifiOn() then
-        logger.info("Kobo standby: Wi-Fi is still on: not entering lights on standby")
-        return
-    end
-
+local function suspendToRAM()
     logger.info("Kobo standby: entering lights on standby")
     logger.info("Kobo standby: asking for a suspend to RAM . . .")
     local f = io.open("/sys/power/state", "w")
@@ -840,6 +829,23 @@ function Kobo:enterStandby()
         logger.err('write error: ', err_msg, err_code)
     end
     f:close()
+end
+
+-- TODO: Setup a wake alarm for AutoSuspend plugin stuff
+function Kobo:enterStandby()
+    if self.powerd:isCharging() then
+        logger.info("Kobo standby: Device is charging: not entering lights on standby")
+        return
+    end
+
+    if isWifiOn() then
+        logger.info("Kobo standby: Wi-Fi is still on: not entering lights on standby")
+        return
+    end
+
+    local UIManager = require("ui/uimanager")
+    UIManager:unschedule(suspendToRAM)
+    UIManager:scheduleIn(6, suspendToRAM)
 end
 
 -- TODO: Clear said alarms ;p.
