@@ -811,14 +811,19 @@ end
 
 -- TODO: Setup a wake alarm for AutoSuspend plugin stuff
 function Kobo:enterStandby()
-    if self:isWifiOn() then
-        logger.info("Kobo: Wi-Fi is still on: not entering lights on standby")
+    if self.powerd:isCharging() then
+        logger.info("Kobo standby: Device is charging: not entering lights on standby")
         return
     end
 
-    logger.info("Kobo: entering lights on standby")
+    if self:isWifiOn() then
+        logger.info("Kobo standby: Wi-Fi is still on: not entering lights on standby")
+        return
+    end
+
+    logger.info("Kobo standby: entering lights on standby")
     logger.info("Kobo standby: asking for a suspend to RAM . . .")
-    f = io.open("/sys/power/state", "w")
+    local f = io.open("/sys/power/state", "w")
     if not f then
         return
     end
