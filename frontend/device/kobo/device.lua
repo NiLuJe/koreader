@@ -827,7 +827,7 @@ local function suspendToRAM()
     if not f then
         return
     end
-    re, err_msg, err_code = f:write("mem\n")
+    local re, err_msg, err_code = f:write("mem\n")
     -- NOTE: At this point, we *should* be in suspend to RAM, as such,
     -- execution should only resume on wakeup...
 
