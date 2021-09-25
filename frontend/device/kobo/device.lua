@@ -616,11 +616,30 @@ local function getProductId()
     return product_id
 end
 
+-- "Lights on" standby, not a full suspend ;).
+local function suspendToRAM()
+    logger.info("Kobo standby: asking for a suspend to RAM . . .")
+    local f = io.open("/sys/power/state", "we")
+    if not f then
+        return
+    end
+    local re, err_msg, err_code = f:write("mem\n")
+    -- NOTE: At this point, we *should* be in suspend to RAM, as such,
+    -- execution should only resume on wakeup...
+
+    logger.info("Kobo standby: ZzZ ZzZ ZzZ? Write syscall returned: ", re)
+    if not re then
+        logger.err('write error: ', err_msg, err_code)
+    end
+    f:close()
+end
+
 local unexpected_wakeup_count = 0
 local function check_unexpected_wakeup()
     local UIManager = require("ui/uimanager")
     -- just in case other events like SleepCoverClosed also scheduled a suspend
     UIManager:unschedule(Kobo.suspend)
+    UIManager:unschedule(suspendToRAM)
 
     -- Do an initial validation to discriminate unscheduled wakeups happening *outside* of the alarm proximity window.
     if WakeupMgr:isWakeupAlarmScheduled() and WakeupMgr:validateWakeupAlarmByProximity() then
@@ -658,6 +677,7 @@ function Kobo:suspend()
     logger.info("Kobo suspend: going to sleep . . .")
     local UIManager = require("ui/uimanager")
     UIManager:unschedule(check_unexpected_wakeup)
+    UIManager:unschedule(suspendToRAM)
     local f, re, err_msg, err_code
     -- NOTE: Sleep as little as possible here, sleeping has a tendency to make
     -- everything mysteriously hang...
@@ -792,7 +812,9 @@ function Kobo:resume()
     logger.info("Kobo resume: clean up after wakeup")
     -- reset unexpected_wakeup_count ASAP
     unexpected_wakeup_count = 0
-    require("ui/uimanager"):unschedule(check_unexpected_wakeup)
+    local UIManager = require("ui/uimanager")
+    UIManager:unschedule(check_unexpected_wakeup)
+    UIManager:unschedule(suspendToRAM)
 
     -- Now that we're up, unflag subsystems for suspend...
     -- NOTE: Sets gSleep_Mode_Suspend to 0. Used as a flag throughout the
@@ -821,25 +843,8 @@ function Kobo:resume()
     end
 end
 
-local function suspendToRAM()
-    logger.info("Kobo standby: asking for a suspend to RAM . . .")
-    local f = io.open("/sys/power/state", "we")
-    if not f then
-        return
-    end
-    local re, err_msg, err_code = f:write("mem\n")
-    -- NOTE: At this point, we *should* be in suspend to RAM, as such,
-    -- execution should only resume on wakeup...
-
-    logger.info("Kobo standby: ZzZ ZzZ ZzZ? Write syscall returned: ", re)
-    if not re then
-        logger.err('write error: ', err_msg, err_code)
-    end
-    f:close()
-end
-
 -- TODO: Setup a wake alarm for AutoSuspend plugin stuff
--- FIXME: Clear up EPDC snafus on resume?
+-- FIXME: Clear up EPDC snafus on resume (... somehow?)?
 function Kobo:enterStandby()
     if self.powerd:isCharging() then
         logger.info("Kobo standby: Device is charging: not entering lights on standby")
