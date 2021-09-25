@@ -1,6 +1,6 @@
 local Device = require("device")
 
-if not Device:isPocketBook() --[[and not Device:isKobo()]] then
+if not Device:isPocketBook() and not Device:isKobo() then
     return { disabled = true }
 end
 
@@ -158,11 +158,7 @@ end
 -- UI signals us that standby is allowed at this very moment because nothing else goes on in the background.
 function AutoStandby:onAllowStandby()
     logger.dbg("AutoStandby: onAllowStandby()")
-    -- In case the OS frontend itself doesn't manage power state, we can do it on our own here.
-    -- One should also configure wake-up pins and perhaps wake alarm,
-    -- if we want to enter deeper sleep states later on from within standby.
-
-    --os.execute("echo mem > /sys/power/state")
+    Device:enterStandby()
 end
 
 return AutoStandby

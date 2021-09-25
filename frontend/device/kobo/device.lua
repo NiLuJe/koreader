@@ -809,6 +809,33 @@ function Kobo:resume()
     end
 end
 
+-- TODO: Setup a wake alarm for AutoSuspend plugin stuff
+function Kobo:enterStandby()
+    if self:isWifiOn() then
+        logger.info("Kobo: Wi-Fi is still on: not entering lights on standby")
+        return
+    end
+
+    logger.info("Kobo: entering lights on standby")
+    logger.info("Kobo standby: asking for a suspend to RAM . . .")
+    f = io.open("/sys/power/state", "w")
+    if not f then
+        return
+    end
+    re, err_msg, err_code = f:write("mem\n")
+    -- NOTE: At this point, we *should* be in suspend to RAM, as such,
+    -- execution should only resume on wakeup...
+
+    logger.info("Kobo standby: ZzZ ZzZ ZzZ? Write syscall returned: ", re)
+    if not re then
+        logger.err('write error: ', err_msg, err_code)
+    end
+    f:close()
+end
+
+-- TODO: Clear said alarms ;p.
+function Kobo:exitStandby() end
+
 function Kobo:saveSettings()
     -- save frontlight state to G_reader_settings (and NickelConf if needed)
     self.powerd:saveSettings()

@@ -384,6 +384,13 @@ function Device:notifyBookState(title, document) end
 -- and only if allowed state is true at the time of waitForEvents() invocation.
 function Device:setAutoStandby(isAllowed) end
 
+-- In case the OS frontend itself doesn't manage power state, we can do it on our own here.
+-- One should also configure wake-up pins and perhaps wake alarm,
+-- if we want to enter deeper sleep states later on from within standby.
+function Device:enterStandby() end
+
+function Device:exitStandby() end
+
 -- Hardware specific method to set OS-level file associations to launch koreader. Expects boolean map.
 function Device:associateFileExtensions(exts)
     logger.dbg("Device:associateFileExtensions():", util.tableSize(exts), "entries, OS handler missing")
