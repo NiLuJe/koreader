@@ -1785,8 +1785,10 @@ Called once we're done with whatever we were doing in the background.
 Standby is re-enabled only after all issued prevents are paired with allowStandby for each one.
 ]]
 function UIManager:allowStandby()
+    logger.dbg("UIManager:allowStandby <-", self._prevent_standby_count)
     assert(self._prevent_standby_count > 0, "allowing standby that isn't prevented; you have an allow/prevent mismatch somewhere")
     self._prevent_standby_count = self._prevent_standby_count - 1
+    logger.dbg("UIManager:allowStandby ->", self._prevent_standby_count)
 end
 
 --[[--
@@ -1795,14 +1797,17 @@ Prevent standby.
 i.e., something is happening in background, yet UI may tick.
 ]]
 function UIManager:preventStandby()
+    logger.dbg("UIManager:preventStandby <-", self._prevent_standby_count)
     self._prevent_standby_count = self._prevent_standby_count + 1
+    logger.dbg("UIManager:preventStandby ->", self._prevent_standby_count)
 end
 
 -- The allow/prevent calls above can interminently allow standbys, but we're not interested until
 -- the state change crosses UI tick boundary, which is what self._prev_prevent_standby_count is tracking.
 function UIManager:_standbyTransition()
-    if self._prevent_standby_count == 0 and self._prev_prevent_standby_count > 0 then
-        -- edge prevent->allow
+    logger.info("UIManager:_standbyTransition", self._prevent_standby_count, self._prev_prevent_standby_count)
+    if self._prevent_standby_count == 0 and self._prev_prevent_standby_count >= 0 then
+        -- edge prevent->allow (or initial state, which is allow)
         logger.dbg("allow standby")
         Device:setAutoStandby(true)
         self:broadcastEvent(Event:new("AllowStandby"))
