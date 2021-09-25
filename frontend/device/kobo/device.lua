@@ -463,6 +463,21 @@ function Kobo:setDateTime(year, month, day, hour, min, sec)
     end
 end
 
+local function isWifiOn()
+    local needle = os.getenv("WIFI_MODULE") or "sdio_wifi_pwr"
+    local nlen = #needle
+    -- /proc/modules is usually empty, unless Wi-Fi or USB is enabled
+    -- We could alternatively check if lfs.attributes("/proc/sys/net/ipv4/conf/" .. os.getenv("INTERFACE"), "mode") == "directory"
+    -- c.f., also what Cervantes does via /sys/class/net/eth0/carrier to check if the interface is up.
+    -- That said, since we only care about whether *modules* are loaded, this does the job nicely.
+    for haystack in io.lines("/proc/modules") do
+        if haystack:sub(1, nlen) == needle then
+            return true
+        end
+    end
+    return false
+end
+
 function Kobo:initNetworkManager(NetworkMgr)
     function NetworkMgr:turnOffWifi(complete_callback)
         self:releaseIP()
@@ -502,18 +517,7 @@ function Kobo:initNetworkManager(NetworkMgr)
     -- NOTE: Cheap-ass way of checking if Wi-Fi seems to be enabled...
     --       Since the crux of the issues lies in race-y module unloading, this is perfectly fine for our usage.
     function NetworkMgr:isWifiOn()
-        local needle = os.getenv("WIFI_MODULE") or "sdio_wifi_pwr"
-        local nlen = #needle
-        -- /proc/modules is usually empty, unless Wi-Fi or USB is enabled
-        -- We could alternatively check if lfs.attributes("/proc/sys/net/ipv4/conf/" .. os.getenv("INTERFACE"), "mode") == "directory"
-        -- c.f., also what Cervantes does via /sys/class/net/eth0/carrier to check if the interface is up.
-        -- That said, since we only care about whether *modules* are loaded, this does the job nicely.
-        for haystack in io.lines("/proc/modules") do
-            if haystack:sub(1, nlen) == needle then
-                return true
-            end
-        end
-        return false
+        return isWifiOn()
     end
 end
 
@@ -816,7 +820,7 @@ function Kobo:enterStandby()
         return
     end
 
-    if self:isWifiOn() then
+    if isWifiOn() then
         logger.info("Kobo standby: Wi-Fi is still on: not entering lights on standby")
         return
     end
