@@ -833,6 +833,7 @@ local function suspendToRAM()
 end
 
 -- TODO: Setup a wake alarm for AutoSuspend plugin stuff
+-- FIXME: Clear up EPDC snafus on resume?
 function Kobo:enterStandby()
     if self.powerd:isCharging() then
         logger.info("Kobo standby: Device is charging: not entering lights on standby")
