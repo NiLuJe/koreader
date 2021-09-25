@@ -574,7 +574,7 @@ function Kobo:getCodeName()
     local codename = os.getenv("PRODUCT")
     -- If that fails, run the script ourselves
     if not codename then
-        local std_out = io.popen("/bin/kobo_config.sh 2>/dev/null", "r")
+        local std_out = io.popen("/bin/kobo_config.sh 2>/dev/null", "re")
         codename = std_out:read("*line")
         std_out:close()
     end
@@ -582,7 +582,7 @@ function Kobo:getCodeName()
 end
 
 function Kobo:getFirmwareVersion()
-    local version_file = io.open("/mnt/onboard/.kobo/version", "r")
+    local version_file = io.open("/mnt/onboard/.kobo/version", "re")
     if not version_file then
         self.firmware_rev = "none"
     end
@@ -603,7 +603,7 @@ local function getProductId()
     local product_id = os.getenv("MODEL_NUMBER")
     -- If that fails, devise it ourselves
     if not product_id then
-        local version_file = io.open("/mnt/onboard/.kobo/version", "r")
+        local version_file = io.open("/mnt/onboard/.kobo/version", "re")
         if not version_file then
             return "000"
         end
