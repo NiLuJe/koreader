@@ -846,6 +846,9 @@ end
 -- TODO: Setup a wake alarm for AutoSuspend plugin stuff
 -- FIXME: Clear up EPDC snafus on resume (... somehow?)?
 function Kobo:enterStandby()
+    -- TODO: We might be able to handle these two via a preventStandby/allowStandby pair in their matching on/off events
+    --       (In DeviceListener? Behind isKobo checks to avoid screwing with platforms where they're unreliable).
+    --       Will need an initial check (in UIManager, on instantiation?); where we can probably do the charging LED stuff, too.
     if self.powerd:isCharging() then
         logger.info("Kobo standby: Device is charging: not entering lights on standby")
         return
