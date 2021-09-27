@@ -844,6 +844,7 @@ function Kobo:resume()
 end
 
 -- TODO: Setup a wake alarm for AutoSuspend plugin stuff
+-- TODO: Deal with power/sleepcover button press during standbvy?
 -- FIXME: Clear up EPDC snafus on resume (... somehow?)?
 function Kobo:enterStandby()
     -- TODO: We might be able to handle these two via a preventStandby/allowStandby pair in their matching on/off events
