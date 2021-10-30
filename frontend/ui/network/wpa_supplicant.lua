@@ -27,6 +27,9 @@ function WpaSupplicant:getNetworkList()
     local curr_network = self:getCurrentNetwork()
 
     for _, network in ipairs(list) do
+        print("curr_network", curr_network.ssid)
+        print("network", network.ssid)
+
         network.signal_quality = network:getSignalQuality()
         local saved_nw = saved_networks:readSetting(network.ssid)
         if saved_nw then
@@ -37,6 +40,7 @@ function WpaSupplicant:getNetworkList()
         end
         --- @todo also verify bssid if it is not set to any
         if curr_network and curr_network.ssid == network.ssid then
+            print("CONNECTED :)")
             network.connected = true
             network.wpa_supplicant_id = curr_network.id
         end

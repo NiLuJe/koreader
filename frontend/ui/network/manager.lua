@@ -620,7 +620,9 @@ function NetworkMgr:reconnectOrShowNetworkMenu(complete_callback)
                     -- the invocation will check its global config, and if an AP configured there is reachable,
                     -- it'll already have connected to it on its own.
                     success = true
-                elseif network.password then
+                elseif network.password and not success then
+                    -- If we hit a preferred network and we're not already connected,
+                    -- attempt to connect to said preferred network.
                     success, err_msg = NetworkMgr:authenticateNetwork(network)
                 end
                 if success then
