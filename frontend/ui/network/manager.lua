@@ -652,7 +652,6 @@ function NetworkMgr:reconnectOrShowNetworkMenu(complete_callback)
                     text = T(_("Connected to network %1"), BD.wrap(network.ssid)),
                     timeout = 3,
                 })
-                break
             else
                 UIManager:show(InfoMessage:new{
                     text = err_msg,
