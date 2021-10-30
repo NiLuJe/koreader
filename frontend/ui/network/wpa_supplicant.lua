@@ -110,6 +110,8 @@ function WpaSupplicant:authenticateNetwork(network)
     while cnt < max_retry do
         print("attempt", cnt)
         -- Start by checking if we're not actually connected already...
+        -- NOTE: This is mainly to catch corner-cases where our preferred network list differs from the system's,
+        --       and ours happened to be sorted earlier because of a better signal quality...
         local connected = wcli:getConnectedNetwork()
         if connected then
             network.wpa_supplicant_id = connected.id
