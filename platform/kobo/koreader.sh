@@ -247,6 +247,7 @@ if [ "${PLATFORM}" = "b300-ntx" ]; then
     export FBINK_FORCE_ROTA=0
     # Screen is too fast for GL16 not to look like utter crap.
     FBINK_WFM="GC16"
+    FBINK_FLASH="-f"
     # And we also cannot use batched updates for the crash screens, as buffers are private,
     # so each invocation essentially draws in a different buffer...
     FBINK_BATCH_FLAG=""
@@ -259,6 +260,7 @@ if [ "${PLATFORM}" = "b300-ntx" ]; then
     KOBO_TS_INPUT="/dev/input/by-path/platform-0-0010-event"
 else
     FBINK_WFM="GL16"
+    FBINK_FLASH=""
     FBINK_BATCH_FLAG="-b"
     FBINK_BGLESS_FLAG="-O"
     FBINK_OT_PADDING=""
@@ -402,18 +404,18 @@ while [ ${RETURN_VALUE} -ne 0 ]; do
         # Start with a big gray screen of death, and our friendly old school crash icon ;)
         # U+1F4A3, the hard way, because we can't use \u or \U escape sequences...
         # shellcheck disable=SC2039,SC3003
-        ./fbink -q ${FBINK_BATCH_FLAG} -c -B GRAY9 -m -t regular=./fonts/freefont/FreeSerif.ttf,px=${bombHeight},top=${bombMargin} -W ${FBINK_WFM} -- $'\xf0\x9f\x92\xa3'
+        ./fbink -q ${FBINK_BATCH_FLAG} -c -B GRAY9 -m -t regular=./fonts/freefont/FreeSerif.ttf,px=${bombHeight},top=${bombMargin} -W ${FBINK_WFM} ${FBINK_FLASH} -- $'\xf0\x9f\x92\xa3'
         # With a little notice at the top of the screen, on a big gray screen of death ;).
-        ./fbink -q ${FBINK_BATCH_FLAG} ${FBINK_BGLESS_FLAG} -m -y 1 "Don't Panic! (Crash n°${CRASH_COUNT} -> ${RETURN_VALUE})" -W ${FBINK_WFM}
+        ./fbink -q ${FBINK_BATCH_FLAG} ${FBINK_BGLESS_FLAG} -m -y 1 -W ${FBINK_WFM} ${FBINK_FLASH} -- "Don't Panic! (Crash n°${CRASH_COUNT} -> ${RETURN_VALUE})"
         if [ ${CRASH_COUNT} -eq 1 ]; then
             # Warn that we're waiting on a tap to continue...
-            ./fbink -q ${FBINK_BATCH_FLAG} ${FBINK_BGLESS_FLAG} -m -y 2 "Tap the screen to continue." -W ${FBINK_WFM}
+            ./fbink -q ${FBINK_BATCH_FLAG} ${FBINK_BGLESS_FLAG} -m -y 2 -W ${FBINK_WFM} ${FBINK_FLASH} -- "Tap the screen to continue."
         fi
         # And then print the tail end of the log on the bottom of the screen...
         crashLog="$(tail -n 25 crash.log | sed -e 's/\t/    /g')"
         # The idea for the margins being to leave enough room for an fbink -Z bar, small horizontal margins, and a font size based on what 6pt looked like @ 265dpi
         # shellcheck disable=SC2086
-        ./fbink -q ${FBINK_BATCH_FLAG} ${FBINK_BGLESS_FLAG} -t regular=./fonts/droid/DroidSansMono.ttf,top=$((viewHeight / 2 + FONTH * 2 + FONTH / 2)),left=$((viewWidth / 60)),right=$((viewWidth / 60)),px=$((viewHeight / 64))${FBINK_OT_PADDING} -W ${FBINK_WFM} -- "${crashLog}"
+        ./fbink -q ${FBINK_BATCH_FLAG} ${FBINK_BGLESS_FLAG} -t regular=./fonts/droid/DroidSansMono.ttf,top=$((viewHeight / 2 + FONTH * 2 + FONTH / 2)),left=$((viewWidth / 60)),right=$((viewWidth / 60)),px=$((viewHeight / 64))${FBINK_OT_PADDING} -W ${FBINK_WFM} ${FBINK_FLASH} -- "${crashLog}"
         if [ "${PLATFORM}" != "b300-ntx" ]; then
             # So far, we hadn't triggered an actual screen refresh, do that now, to make sure everything is bundled in a single flashing refresh.
             ./fbink -q -f -s
