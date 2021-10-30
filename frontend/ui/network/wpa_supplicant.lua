@@ -104,7 +104,7 @@ function WpaSupplicant:authenticateNetwork(network)
     local failure_cnt = 0
     local max_retry = 30
     local info = InfoMessage:new{text = _("Authenticating…")}
-    local msg
+    local msg = _("Authenticated")
     UIManager:show(info)
     UIManager:forceRePaint()
     while cnt < max_retry do
