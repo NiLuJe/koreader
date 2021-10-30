@@ -614,13 +614,14 @@ function NetworkMgr:reconnectOrShowNetworkMenu(complete_callback)
             self.wifi_toggle_long_press = nil
         else
             for dummy, network in ipairs(network_list) do
+                local err_msg
                 if network.connected then
                     -- On platforms where we use wpa_supplicant (if we're calling this, we are),
                     -- the invocation will check its global config, and if an AP configured there is reachable,
                     -- it'll already have connected to it on its own.
                     success = true
                 elseif network.password then
-                    success = NetworkMgr:authenticateNetwork(network)
+                    success, err_msg = NetworkMgr:authenticateNetwork(network)
                 end
                 if success then
                     NetworkMgr:obtainIP()
@@ -632,6 +633,11 @@ function NetworkMgr:reconnectOrShowNetworkMenu(complete_callback)
                         timeout = 3,
                     })
                     break
+                else
+                    UIManager:show(InfoMessage:new{
+                        text = err_msg,
+                        timeout = 3,
+                    })
                 end
             end
         end

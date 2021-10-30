@@ -4,7 +4,7 @@ WPA client helper for Kobo.
 
 local FFIUtil = require("ffi/util")
 local InfoMessage = require("ui/widget/infomessage")
-local WpaClient = require('lj-wpaclient/wpaclient')
+local WpaClient = require("lj-wpaclient/wpaclient")
 local UIManager = require("ui/uimanager")
 local _ = require("gettext")
 local T = FFIUtil.template
@@ -26,7 +26,7 @@ function WpaSupplicant:getNetworkList()
     local saved_networks = self:getAllSavedNetworks()
     local curr_network = self:getCurrentNetwork()
 
-    for _,network in ipairs(list) do
+    for _, network in ipairs(list) do
         network.signal_quality = network:getSignalQuality()
         local saved_nw = saved_networks:readSetting(network.ssid)
         if saved_nw then
@@ -58,6 +58,7 @@ end
 
 --- Authenticates network.
 function WpaSupplicant:authenticateNetwork(network)
+    print("WpaSupplicant:authenticateNetwork on", network.ssid)
     local err, wcli, nw_id
 
     wcli, err = WpaClient.new(self.wpa_supplicant.ctrl_interface)
@@ -103,19 +104,34 @@ function WpaSupplicant:authenticateNetwork(network)
     UIManager:show(info)
     UIManager:forceRePaint()
     while cnt < max_retry do
+        print("attempt", cnt)
+        -- Start by checking if we're not actually connected already...
+        local connected = wcli:getConnectedNetwork()
+        if connected then
+            network.wpa_supplicant_id = connected.id
+            network.ssid = connected.ssid
+            re = true
+            break
+        end
+
+        -- Otherwise, poke at the wpa_supplicant socket for a bit...
         local ev = wcli:readEvent()
         if ev ~= nil then
+            print("msg:", ev.msg)
             if not ev:isScanEvent() then
+                print("!isScanEvent")
                 UIManager:close(info)
                 info = InfoMessage:new{text = ev.msg}
                 UIManager:show(info)
                 UIManager:forceRePaint()
             end
             if ev:isAuthSuccessful() then
+                print("isAuthSuccessful")
                 network.wpa_supplicant_id = nw_id
                 re = true
                 break
             elseif ev:isAuthFailed() then
+                print("isAuthFailed")
                 failure_cnt = failure_cnt + 1
                 if failure_cnt > 3 then
                     re, msg = false, _("Failed to authenticate")
@@ -123,6 +139,7 @@ function WpaSupplicant:authenticateNetwork(network)
                 end
             end
         else
+            print("sleeping")
             FFIUtil.sleep(1)
             cnt = cnt + 1
         end
