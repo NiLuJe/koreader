@@ -27,7 +27,7 @@ function WpaSupplicant:getNetworkList()
     local curr_network = self:getCurrentNetwork()
 
     for _, network in ipairs(list) do
-        print("curr_network", curr_network.ssid)
+        print("curr_network", curr_network and curr_network.ssid or "N/A")
         print("network", network.ssid)
 
         network.signal_quality = network:getSignalQuality()
