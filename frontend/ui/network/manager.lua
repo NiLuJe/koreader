@@ -613,6 +613,7 @@ function NetworkMgr:reconnectOrShowNetworkMenu(complete_callback)
         if self.wifi_toggle_long_press then
             self.wifi_toggle_long_press = nil
         else
+            local ssid
             -- We need to do two passes, as we may have *both* an already connected network (from the global wpa config),
             -- *and* preferred networks, and if the prferred networks have a better signal quality,
             -- they'll be sorted *earlier*, which would cause us to try to associate to a different AP than
@@ -623,6 +624,7 @@ function NetworkMgr:reconnectOrShowNetworkMenu(complete_callback)
                     -- the invocation will check its global config, and if an AP configured there is reachable,
                     -- it'll already have connected to it on its own.
                     success = true
+                    ssid = network.ssid
                     break
                 end
             end
@@ -637,6 +639,7 @@ function NetworkMgr:reconnectOrShowNetworkMenu(complete_callback)
                         success, err_msg = NetworkMgr:authenticateNetwork(network)
                         print("authenticateNetwork success:", success, err_msg)
                         if success then
+                            ssid = network.ssid
                             break
                         end
                     end
@@ -649,7 +652,7 @@ function NetworkMgr:reconnectOrShowNetworkMenu(complete_callback)
                     complete_callback()
                 end
                 UIManager:show(InfoMessage:new{
-                    text = T(_("Connected to network %1"), BD.wrap(network.ssid)),
+                    text = T(_("Connected to network %1"), BD.wrap(ssid)),
                     timeout = 3,
                 })
             else
