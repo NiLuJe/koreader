@@ -122,12 +122,21 @@ function WpaSupplicant:authenticateNetwork(network)
         -- Start by checking if we're not actually connected already...
         -- NOTE: This is mainly to catch corner-cases where our preferred network list differs from the system's,
         --       and ours happened to be sorted earlier because of a better signal quality...
-        local connected = wcli:getConnectedNetwork()
+        local connected, state = wcli:getConnectedNetwork()
         if connected then
             network.wpa_supplicant_id = connected.id
             network.ssid = connected.ssid
             success = true
             break
+        else
+            if state then
+                UIManager:close(info)
+                -- Make the state prettier
+                local first, rest = state:sub(1, 1), state:sub(2)
+                info = InfoMessage:new{text = string.upper(first) .. string.lower(rest) .. "…"}
+                UIManager:show(info)
+                UIManager:forceRePaint()
+            end
         end
 
         -- Otherwise, poke at the wpa_supplicant socket for a bit...
