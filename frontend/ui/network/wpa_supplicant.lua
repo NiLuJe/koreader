@@ -146,7 +146,7 @@ function WpaSupplicant:authenticateNetwork(network)
             end
         else
             print("sleeping")
-            FFIUtil.sleep(1)
+            wcli:waitForEvent(1 * 1000)
             cnt = cnt + 1
         end
     end
