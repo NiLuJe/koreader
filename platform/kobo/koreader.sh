@@ -403,12 +403,14 @@ while [ ${RETURN_VALUE} -ne 0 ]; do
         bombMargin=$((FONTH + FONTH / 2))
         # Start with a big gray screen of death, and our friendly old school crash icon ;)
         # U+1F4A3, the hard way, because we can't use \u or \U escape sequences...
-        # shellcheck disable=SC2039,SC3003
+        # shellcheck disable=SC2039,SC3003,SC2086
         ./fbink -q ${FBINK_BATCH_FLAG} -c -B GRAY9 -m -t regular=./fonts/freefont/FreeSerif.ttf,px=${bombHeight},top=${bombMargin} -W ${FBINK_WFM} ${FBINK_FLASH} -- $'\xf0\x9f\x92\xa3'
         # With a little notice at the top of the screen, on a big gray screen of death ;).
+         # shellcheck disable=SC2086
         ./fbink -q ${FBINK_BATCH_FLAG} ${FBINK_BGLESS_FLAG} -m -y 1 -W ${FBINK_WFM} ${FBINK_FLASH} -- "Don't Panic! (Crash n°${CRASH_COUNT} -> ${RETURN_VALUE})"
         if [ ${CRASH_COUNT} -eq 1 ]; then
             # Warn that we're waiting on a tap to continue...
+            # shellcheck disable=SC2086
             ./fbink -q ${FBINK_BATCH_FLAG} ${FBINK_BGLESS_FLAG} -m -y 2 -W ${FBINK_WFM} ${FBINK_FLASH} -- "Tap the screen to continue."
         fi
         # And then print the tail end of the log on the bottom of the screen...
