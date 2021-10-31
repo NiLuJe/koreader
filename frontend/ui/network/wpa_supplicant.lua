@@ -15,7 +15,6 @@ local WpaSupplicant = {}
 
 --- Gets network list.
 function WpaSupplicant:getNetworkList()
-    print("Entering getNetworkList")
     local wcli, err = WpaClient.new(self.wpa_supplicant.ctrl_interface)
     if wcli == nil then
         return nil, T(CLIENT_INIT_ERR_MSG, err)
@@ -32,9 +31,6 @@ function WpaSupplicant:getNetworkList()
     local curr_network = self:getCurrentNetwork()
 
     for _, network in ipairs(list) do
-        print("curr_network", curr_network and curr_network.ssid or "N/A")
-        print("network", network.ssid)
-
         network.signal_quality = network:getSignalQuality()
         local saved_nw = saved_networks:readSetting(network.ssid)
         if saved_nw then
@@ -45,12 +41,10 @@ function WpaSupplicant:getNetworkList()
         end
         --- @todo also verify bssid if it is not set to any
         if curr_network and curr_network.ssid == network.ssid then
-            print("CONNECTED :)")
             network.connected = true
             network.wpa_supplicant_id = curr_network.id
         end
     end
-    print("Exiting getNetworkList w/", #list)
     return list
 end
 
@@ -68,7 +62,6 @@ end
 
 --- Authenticates network.
 function WpaSupplicant:authenticateNetwork(network)
-    print("WpaSupplicant:authenticateNetwork on", network.ssid)
     local wcli, reply, err
 
     wcli, err = WpaClient.new(self.wpa_supplicant.ctrl_interface)
@@ -118,7 +111,6 @@ function WpaSupplicant:authenticateNetwork(network)
     UIManager:show(info)
     UIManager:forceRePaint()
     while cnt < max_retry do
-        print("attempt", cnt)
         -- Start by checking if we're not actually connected already...
         -- NOTE: This is mainly to catch corner-cases where our preferred network list differs from the system's,
         --       and ours happened to be sorted earlier because of a better signal quality...
@@ -142,21 +134,17 @@ function WpaSupplicant:authenticateNetwork(network)
         -- Otherwise, poke at the wpa_supplicant socket for a bit...
         local ev = wcli:readEvent()
         if ev ~= nil then
-            print("msg:", ev.msg)
             if not ev:isScanEvent() then
-                print("!isScanEvent")
                 UIManager:close(info)
                 info = InfoMessage:new{text = ev.msg}
                 UIManager:show(info)
                 UIManager:forceRePaint()
             end
             if ev:isAuthSuccessful() then
-                print("isAuthSuccessful")
                 network.wpa_supplicant_id = nw_id
                 success = true
                 break
             elseif ev:isAuthFailed() then
-                print("isAuthFailed")
                 failure_cnt = failure_cnt + 1
                 if failure_cnt > 3 then
                     success, msg = false, _("Failed to authenticate")
@@ -164,7 +152,6 @@ function WpaSupplicant:authenticateNetwork(network)
                 end
             end
         else
-            print("sleeping")
             wcli:waitForEvent(1 * 1000)
             cnt = cnt + 1
         end
