@@ -21,7 +21,8 @@ function WpaSupplicant:getNetworkList()
         return nil, T(CLIENT_INIT_ERR_MSG, err)
     end
 
-    local list, err = wcli:scanThenGetResults()
+    local list
+    list, err = wcli:scanThenGetResults()
     wcli:close()
     if list == nil then
         return nil, T("An error occurred while scanning: %1.", err)
