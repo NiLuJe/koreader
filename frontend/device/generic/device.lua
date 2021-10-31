@@ -311,7 +311,7 @@ function Device:onPowerEvent(ev)
 
                 -- On Kobo, on sunxi SoCs with a recent kernel, wait a tiny bit more to avoid weird refresh glitches...
                 if self:isKobo() and self:isSunxi() then
-                    ffiUtil.usleep(1000)
+                    ffiUtil.usleep(150 * 1000)
                 end
             end
         else
