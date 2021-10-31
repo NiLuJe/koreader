@@ -629,10 +629,10 @@ function NetworkMgr:reconnectOrShowNetworkMenu(complete_callback)
                 end
             end
 
-            -- Next look for our own prferred networks...
+            -- Next, look for our own prferred networks...
+            local err_msg = _("Connection failed")
             if not success then
                 for dummy, network in ipairs(network_list) do
-                    local err_msg
                     if network.password then
                         -- If we hit a preferred network and we're not already connected,
                         -- attempt to connect to said preferred network....
