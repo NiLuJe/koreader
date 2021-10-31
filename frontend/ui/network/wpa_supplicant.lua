@@ -24,7 +24,7 @@ function WpaSupplicant:getNetworkList()
     local list, err = wcli:scanThenGetResults()
     wcli:close()
     if list == nil then
-        reply nil, T("An error occurred while scanning: %1.", err)
+        return nil, T("An error occurred while scanning: %1.", err)
     end
 
     local saved_networks = self:getAllSavedNetworks()
