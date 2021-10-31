@@ -406,7 +406,7 @@ while [ ${RETURN_VALUE} -ne 0 ]; do
         # shellcheck disable=SC2039,SC3003,SC2086
         ./fbink -q ${FBINK_BATCH_FLAG} -c -B GRAY9 -m -t regular=./fonts/freefont/FreeSerif.ttf,px=${bombHeight},top=${bombMargin} -W ${FBINK_WFM} ${FBINK_FLASH} -- $'\xf0\x9f\x92\xa3'
         # With a little notice at the top of the screen, on a big gray screen of death ;).
-         # shellcheck disable=SC2086
+        # shellcheck disable=SC2086
         ./fbink -q ${FBINK_BATCH_FLAG} ${FBINK_BGLESS_FLAG} -m -y 1 -W ${FBINK_WFM} ${FBINK_FLASH} -- "Don't Panic! (Crash n°${CRASH_COUNT} -> ${RETURN_VALUE})"
         if [ ${CRASH_COUNT} -eq 1 ]; then
             # Warn that we're waiting on a tap to continue...
