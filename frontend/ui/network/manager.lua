@@ -599,6 +599,7 @@ function NetworkMgr:reconnectOrShowNetworkMenu(complete_callback)
         --       rescan if the first scan appeared to yield an empty list.
         --- @fixme This *might* be an issue better handled in lj-wpaclient...
         if #network_list == 0 then
+            print("Running a second scan...")
             network_list, err = self:getNetworkList()
             if network_list == nil then
                 UIManager:show(InfoMessage:new{text = err})

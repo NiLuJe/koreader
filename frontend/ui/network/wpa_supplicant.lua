@@ -15,6 +15,7 @@ local WpaSupplicant = {}
 
 --- Gets network list.
 function WpaSupplicant:getNetworkList()
+    print("Entering getNetworkList")
     local wcli, err = WpaClient.new(self.wpa_supplicant.ctrl_interface)
     if wcli == nil then
         return nil, T(CLIENT_INIT_ERR_MSG, err)
@@ -45,6 +46,7 @@ function WpaSupplicant:getNetworkList()
             network.wpa_supplicant_id = curr_network.id
         end
     end
+    print("Exiting getNetworkList w/", #list)
     return list
 end
 
