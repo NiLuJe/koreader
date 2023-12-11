@@ -1194,6 +1194,11 @@ function Kobo:standby(max_duration)
             --       (It's called on resume anyway).
             self:toggleChargingLED(false)
         end
+
+        -- Force the next refresh to be fenced, in the hope it'll circumvent an extremely rare sunxi issue
+        -- that could cause the first refresh after a wakeup from standby to be ineffective.
+        -- (This is a NOP outside of sunxi)
+        self.screen.no_merge_next_update = true
     else
         logger.warn("Kobo standby: the kernel refused to enter standby!")
         if G_reader_settings:isTrue("pm_debug_entry_failure") then
