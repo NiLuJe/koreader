@@ -175,5 +175,11 @@ esac
 ifconfig "${INTERFACE}" up
 [ "${WIFI_MODULE}" = "dhd" ] && wlarm_le -i "${INTERFACE}" up
 
+# The wifi config moved in FW 5.x
+if [ -f "/mnt/onboard/.kobo/wpa_supplicant.conf" ]; then
+    WPA_SUPP_CONF="/mnt/onboard/.kobo/wpa_supplicant.conf"
+else
+    WPA_SUPP_CONF="/etc/wpa_supplicant/wpa_supplicant.conf"
+fi
 pkill -0 wpa_supplicant ||
-    wpa_supplicant -D "${WPA_SUPPLICANT_DRIVER}" -s -i "${INTERFACE}" -c /etc/wpa_supplicant/wpa_supplicant.conf -C /var/run/wpa_supplicant -B
+    wpa_supplicant -D "${WPA_SUPPLICANT_DRIVER}" -s -i "${INTERFACE}" -c "${WPA_SUPP_CONF}" -C /var/run/wpa_supplicant -B
