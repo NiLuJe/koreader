@@ -177,7 +177,8 @@ ifconfig "${INTERFACE}" up
 
 # The wifi config moved in FW 5.x
 if [ -f "/mnt/onboard/.kobo/wpa_supplicant.conf" ]; then
-    # FIXME: This might be problematic for USBMS, as we allow Wi-Fi during USBMS (and it happens to be super useful for debugging).
+    # FIXME: This *might* be problematic for USBMS, as we allow Wi-Fi during USBMS (and it happens to be super useful for debugging).
+    #        Although wpa_supplicant doesn't appear to keep an fd open to it (good boy!).
     WPA_SUPP_CONF="/mnt/onboard/.kobo/wpa_supplicant.conf"
 else
     WPA_SUPP_CONF="/etc/wpa_supplicant/wpa_supplicant.conf"
