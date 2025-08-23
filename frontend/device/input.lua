@@ -707,9 +707,12 @@ function Input:handleKeyBoardEv(ev)
     end
     -- On (some?) Kindles, cyttsp will report BTN_TOOL_DOUBLETAP on a two-slot contact... but with no data in the second slot :/.
     -- c.f., https://github.com/koreader/koreader/pull/13714
-    if ev.code == C.BTN_TOOL_DOUBLETAP and ev.value == 1 and self.cur_slot ~= self.main_finger_slot and (self:getCurrentMtSlotData("x") == nil or self:getCurrentMtSlotData("y") == nil) then
-        -- Drop the empty slot to avoid breaking GestureDetector
+    if ev.code == C.BTN_TOOL_DOUBLETAP and ev.value == 1 then
+        -- Drop both slots
         self:setCurrentMtSlot("id", -1)
+        if self.cur_slot ~= self.main_finger_slot then
+            self:setMtSlot(self.main_finger_slot, "id", -1)
+        end
 
         return
     end
